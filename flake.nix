@@ -7,7 +7,7 @@
   outputs = { self, nixpkgs, cppevent }: let
     system = "x86_64-linux";
     pkgs = import nixpkgs {inherit system;};
-    libcppevent = import cppevent.packages.${system}.default;
+    libcppevent = cppevent.packages.${system}.default;
   in {
     packages.${system}.default = pkgs.stdenv.mkDerivation {
       src = builtins.path {
