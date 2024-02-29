@@ -1,0 +1,29 @@
+{
+  description = "Nix flake for tradesim";
+
+  inputs.nixpkgs.url = github:NixOS/nixpkgs;
+  inputs.cppevent.url = github:Manoharan-Ajay-Anand/cppevent;
+
+  outputs = { self, nixpkgs, cppevent }: let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs {inherit system;};
+    libcppevent = import cppevent {}.packages.${system}.default;
+  in {
+    packages.${system}.default = pkgs.stdenv.mkDerivation {
+      src = builtins.path {
+        path = ./.;
+      };
+      name = "tradesim-1.0";
+      inherit system;
+      nativeBuildInputs = [pkgs.cmake libcppevent];
+      buildInputs = [pkgs.liburing];
+    };
+    devShells.${system}.default = pkgs.mkShell {
+      packages = [pkgs.gdb];
+      inputsFrom = [self.packages.${system}.default];
+      shellHook = ''
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -B build -S .
+      '';
+    };
+  };
+}
