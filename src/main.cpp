@@ -1,5 +1,6 @@
 #include <iostream>
 #include <format>
+#include <string_view>
 
 #include <cppevent_base/event_loop.hpp>
 
@@ -28,8 +29,15 @@ public:
 
 }
 
-int main() {
-    std::cout << "Starting tradesim server..." << std::endl;
+int main(int argc, char* argv[]) {
+    if (argc != 3 || std::string_view { argv[1] } != "-p") {
+        std::cout << "format: tradesim -p <PORT>" << std::endl;
+        return 0;
+    }
+
+    char* port = argv[2];
+
+    std::cout << "Starting tradesim server at port " << port << "..." << std::endl;
     cppevent::event_loop loop;
 
     tradesim::welcome_endpoint welcome;
@@ -37,7 +45,7 @@ int main() {
     cppevent::router routes;
     routes.get("/api", welcome);
     
-    cppevent::fcgi_server tradesim_server(NULL, "9000", loop, routes);
+    cppevent::fcgi_server tradesim_server(NULL, port, loop, routes);
 
     loop.run();
     return 0;
