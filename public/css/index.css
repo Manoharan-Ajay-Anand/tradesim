@@ -1,0 +1,13 @@
+#main-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#input-box {
+    padding: 10px;
+}
+
+.input-size {
+    font-size: medium;
+}
