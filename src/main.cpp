@@ -5,6 +5,7 @@
 #include <cppevent_fcgi/fcgi_server.hpp>
 #include <cppevent_fcgi/router.hpp>
 
+#include "exchange.hpp"
 #include "welcome_endpoint.hpp"
 #include "create_endpoint.hpp"
 
@@ -19,10 +20,10 @@ int main(int argc, char* argv[]) {
     std::cout << "Starting tradesim server at port " << port << "..." << std::endl;
     cppevent::event_loop loop;
 
-    tradesim::market_map markets;
+    tradesim::exchange ex;
 
     tradesim::welcome_endpoint welcome;
-    tradesim::create_endpoint create { markets };
+    tradesim::create_endpoint create { ex };
 
     cppevent::router routes;
     routes.get("/api", welcome);
