@@ -8,6 +8,7 @@
 #include "exchange.hpp"
 #include "welcome_endpoint.hpp"
 #include "create_endpoint.hpp"
+#include "stream_endpoint.hpp"
 
 int main(int argc, char* argv[]) {
     if (argc != 3 || std::string_view { argv[1] } != "-p") {
@@ -24,10 +25,12 @@ int main(int argc, char* argv[]) {
 
     tradesim::welcome_endpoint welcome;
     tradesim::create_endpoint create { ex };
+    tradesim::stream_endpoint stream { loop };
 
     cppevent::router routes;
     routes.get("/api", welcome);
     routes.post("/api/create", create);
+    routes.get("/api/stream", stream);
     
     cppevent::fcgi_server tradesim_server(NULL, port, loop, routes);
 

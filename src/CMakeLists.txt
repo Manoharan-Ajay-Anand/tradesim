@@ -3,6 +3,7 @@ add_executable(tradesim
     main.cpp
     exchange.cpp
     market.cpp
+    stream_endpoint.cpp
     welcome_endpoint.cpp
 )
 
