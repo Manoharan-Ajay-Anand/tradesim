@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Starting tradesim server at port " << port << "..." << std::endl;
     cppevent::event_loop loop;
 
-    tradesim::exchange ex;
+    tradesim::exchange ex { loop };
 
     tradesim::welcome_endpoint welcome;
     tradesim::create_endpoint create { ex };

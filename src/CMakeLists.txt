@@ -4,6 +4,8 @@ add_executable(tradesim
     exchange.cpp
     market.cpp
     stream_endpoint.cpp
+    subscription.cpp
+    types.cpp
     welcome_endpoint.cpp
 )
 
