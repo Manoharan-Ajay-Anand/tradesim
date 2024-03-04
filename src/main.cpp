@@ -10,15 +10,7 @@
 #include "create_endpoint.hpp"
 #include "stream_endpoint.hpp"
 
-int main(int argc, char* argv[]) {
-    if (argc != 3 || std::string_view { argv[1] } != "-p") {
-        std::cout << "format: tradesim -p <PORT>" << std::endl;
-        return 1;
-    }
-
-    char* port = argv[2];
-
-    std::cout << "Starting tradesim server at port " << port << "..." << std::endl;
+int main() {
     cppevent::event_loop loop;
 
     tradesim::exchange ex { loop };
@@ -32,7 +24,7 @@ int main(int argc, char* argv[]) {
     routes.post("/api/create", create);
     routes.get("/api/stream", stream);
     
-    cppevent::fcgi_server tradesim_server(NULL, port, loop, routes);
+    cppevent::fcgi_server tradesim_server("/tmp/tradesim.sock", loop, routes);
 
     loop.run();
     return 0;
