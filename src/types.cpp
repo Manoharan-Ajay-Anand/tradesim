@@ -1,5 +1,7 @@
 #include "types.hpp"
 
+#include <cstring>
+
 char* tradesim::object_id::data() {
     return m_arr.data();
 }
@@ -21,14 +23,5 @@ std::string_view tradesim::object_id::get_view() const {
 }
 
 bool tradesim::object_id::operator==(const tradesim::object_id& other) const {
-    if (m_size != other.m_size) {
-        return false;
-    }
-    for (long i = 0; i < m_size; ++i) {
-        if (m_arr[i] != other.m_arr[i]) {
-            return false;
-        }
-    }
-    return true;
+    return m_size == other.m_size && std::memcmp(data(), other.data(), m_size) == 0;
 }
-

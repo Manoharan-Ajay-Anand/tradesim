@@ -2,13 +2,12 @@
 #define TRADESIM_MARKET_HPP
 
 #include "types.hpp"
+#include "market_types.hpp"
 #include "subscription.hpp"
 
 #include <cppevent_base/task.hpp>
 #include <cppevent_base/async_queue.hpp>
 
-#include <string>
-#include <string_view>
 #include <unordered_map>
 #include <list>
 #include <memory>
@@ -25,13 +24,22 @@ using broadcast = std::list<cppevent::output*>;
 
 class market {
 private:
-    std::unordered_map<object_id, long> m_accounts; 
+    std::unordered_map<object_id, position> m_accounts;
     std::unordered_map<object_id, broadcast::const_iterator> m_stream_map;
+
+    std::unordered_map<long, price_point> m_price_points;
+
+    long m_order_count;
+    bid_queue m_bids;
+    ask_queue m_asks;
+
     broadcast m_broadcast;
     cppevent::async_queue<long> m_aq;
     cppevent::awaitable_task<void> m_task;
 
     cppevent::awaitable_task<void> broadcast_trades();
+
+    void update();
 public:
     market(cppevent::event_loop& el);
 
@@ -45,6 +53,9 @@ public:
 
     std::unique_ptr<subscription> subscribe(const object_id& trader_id, cppevent::output* o);
     void unsubscribe(const object_id& trader_id);
+
+    void place_bid(const object_id& trader_id, long price, long quantity);
+    void place_ask(const object_id& trader_id, long price, long quantity);
 };
 
 }

@@ -9,10 +9,6 @@ namespace tradesim {
 
 constexpr long MAX_ID_SIZE = 30; 
 
-constexpr size_t FNV_OFFSET_BASIS = 14695981039346656037ull;
-
-constexpr size_t FNV_PRIME = 1099511628211ull;
-
 class object_id {
 private:
     std::array<char, MAX_ID_SIZE> m_arr;
@@ -39,12 +35,7 @@ namespace std {
 template <>
 struct hash<tradesim::object_id> {
     size_t operator()(const tradesim::object_id& id) const {
-        size_t result = tradesim::FNV_OFFSET_BASIS;
-        for (long i = 0; i < id.size(); ++i) {
-            size_t b = static_cast<size_t>(*(id.data() + i));
-            result = (result ^ b) * tradesim::FNV_PRIME;
-        }
-        return result;
+        return hash<string_view>{}(id.get_view());
     }
 };
 
