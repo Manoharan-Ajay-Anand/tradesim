@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 
-#include <queue>
+#include <map>
 #include <vector>
 
 namespace tradesim {
@@ -13,29 +13,36 @@ enum class order_type {
     ASK = -1
 };
 
+struct order_key {
+    long m_id;
+    long m_price;
+};
+
+struct bid_compare {
+    constexpr bool operator()(const order_key& lhs, const order_key& rhs) const {
+        return lhs.m_id != rhs.m_id &&
+              (lhs.m_price > rhs.m_price || (lhs.m_price == rhs.m_price && lhs.m_id < rhs.m_id));
+    }
+};
+
+struct ask_compare {
+    constexpr bool operator()(const order_key& lhs, const order_key& rhs) const {
+        return lhs.m_id != rhs.m_id &&
+              (lhs.m_price < rhs.m_price || (lhs.m_price == rhs.m_price && lhs.m_id < rhs.m_id));
+    }
+};
+
 struct order {
     long m_id;
     object_id m_trader;
     order_type m_type;
     long m_price;
-    mutable long m_quantity;
+    long m_quantity;
 };
 
-struct bid_compare {
-    constexpr bool operator()(const order& lhs, const order& rhs) const {
-        return rhs.m_price > lhs.m_price || (rhs.m_price == lhs.m_price && rhs.m_id < lhs.m_id);
-    }
-};
+using bid_queue = std::map<order_key, order, bid_compare>;
 
-struct ask_compare {
-    constexpr bool operator()(const order& lhs, const order& rhs) const {
-        return rhs.m_price < lhs.m_price || (rhs.m_price == lhs.m_price && rhs.m_id < lhs.m_id);
-    }
-};
-
-using bid_queue = std::priority_queue<order, std::vector<order>, bid_compare>;
-
-using ask_queue = std::priority_queue<order, std::vector<order>, ask_compare>;
+using ask_queue = std::map<order_key, order, ask_compare>;
 
 struct price_point {
     long m_bid_count = 0;
