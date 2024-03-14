@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 #include "market_types.hpp"
-#include "subscription.hpp"
+#include "broadcast.hpp"
 
 #include <cppevent_base/task.hpp>
 #include <cppevent_base/async_queue.hpp>
@@ -13,27 +13,23 @@
 #include <memory>
 
 namespace cppevent {
+
 class event_loop;
 
-class output;
 }
 
 namespace tradesim {
 
-using broadcast = std::list<cppevent::output*>;
-
 class market {
 private:
     std::unordered_map<object_id, position> m_accounts;
-    std::unordered_map<object_id, broadcast::const_iterator> m_stream_map;
+    broadcast m_broadcast;
 
     std::unordered_map<long, price_point> m_price_points;
-
     long m_order_count;
     bid_queue m_bids;
     ask_queue m_asks;
 
-    broadcast m_broadcast;
     cppevent::async_queue<long> m_aq;
     cppevent::awaitable_task<void> m_task;
 

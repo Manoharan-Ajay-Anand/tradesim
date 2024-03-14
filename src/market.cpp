@@ -55,24 +55,11 @@ std::unique_ptr<tradesim::subscription> tradesim::market::subscribe(const object
     if (m_accounts.find(trader_id) == m_accounts.end()) {
         return {};
     }
-
-    if (m_stream_map.find(trader_id) != m_stream_map.end()) {
-        return {};
-    }
-
-    auto broadcast_it = m_broadcast.insert(m_broadcast.end(), o);
-    m_stream_map[trader_id] = broadcast_it;
-
-    return std::make_unique<tradesim::subscription>(*this, trader_id);
+    return m_broadcast.subscribe(trader_id, o);
 }
 
 void tradesim::market::unsubscribe(const object_id& trader_id) {
-    auto s_it = m_stream_map.find(trader_id);
-    if (s_it == m_stream_map.end()) {
-        return;
-    }
-    m_broadcast.erase(s_it->second);
-    m_stream_map.erase(s_it);
+   m_broadcast.unsubscribe(trader_id);
 }
 
 void tradesim::market::place_bid(const object_id& trader_id, long price, long quantity) {

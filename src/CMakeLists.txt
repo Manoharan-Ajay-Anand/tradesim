@@ -5,7 +5,7 @@ add_executable(tradesim
     market_types.cpp
     market.cpp
     stream_endpoint.cpp
-    subscription.cpp
+    broadcast.cpp
     types.cpp
     welcome_endpoint.cpp
 )
