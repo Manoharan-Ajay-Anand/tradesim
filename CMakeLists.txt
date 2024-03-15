@@ -12,3 +12,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
 add_subdirectory(src)
 
 install(TARGETS tradesim)
+
+include(CTest)
+
+add_subdirectory(test)
+target_include_directories(tradesim_test PRIVATE src)
