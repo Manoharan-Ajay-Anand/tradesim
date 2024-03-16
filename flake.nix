@@ -2,7 +2,10 @@
   description = "Nix flake for tradesim";
 
   inputs.nixpkgs.url = github:NixOS/nixpkgs;
-  inputs.cppevent.url = github:Manoharan-Ajay-Anand/cppevent;
+  inputs.cppevent = {
+    url = github:Manoharan-Ajay-Anand/cppevent;
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs = { self, nixpkgs, cppevent }: let
     system = "x86_64-linux";
