@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 
-#include <map>
+#include <queue>
 #include <vector>
 
 namespace tradesim {
@@ -20,15 +20,13 @@ struct order_key {
 
 struct bid_compare {
     constexpr bool operator()(const order_key& lhs, const order_key& rhs) const {
-        return lhs.m_id != rhs.m_id &&
-              (lhs.m_price > rhs.m_price || (lhs.m_price == rhs.m_price && lhs.m_id < rhs.m_id));
+        return rhs.m_price > lhs.m_price || (rhs.m_price == lhs.m_price && rhs.m_id < lhs.m_id);
     }
 };
 
 struct ask_compare {
     constexpr bool operator()(const order_key& lhs, const order_key& rhs) const {
-        return lhs.m_id != rhs.m_id &&
-              (lhs.m_price < rhs.m_price || (lhs.m_price == rhs.m_price && lhs.m_id < rhs.m_id));
+        return rhs.m_price < lhs.m_price || (rhs.m_price == lhs.m_price && rhs.m_id < lhs.m_id);
     }
 };
 
@@ -40,9 +38,9 @@ struct order {
     long m_quantity;
 };
 
-using bid_queue = std::map<order_key, order, bid_compare>;
+using bid_queue = std::priority_queue<order_key, std::vector<order_key>, bid_compare>;
 
-using ask_queue = std::map<order_key, order, ask_compare>;
+using ask_queue = std::priority_queue<order_key, std::vector<order_key>, ask_compare>;
 
 struct price_point {
     long m_bid_count = 0;

@@ -26,7 +26,9 @@ private:
     broadcast m_broadcast;
 
     std::unordered_map<long, price_point> m_price_points;
+
     long m_order_count;
+    std::unordered_map<long, order> m_orders;
     bid_queue m_bids;
     ask_queue m_asks;
 

@@ -14,9 +14,19 @@ cppevent::awaitable_task<void> tradesim::market::broadcast_trades() {
 }
 
 void tradesim::market::update() {
-    auto bid_it = m_bids.begin();
-    auto ask_it = m_asks.begin();
-    while (bid_it != m_bids.end() && ask_it != m_asks.end()) {
+    while (!m_bids.empty() && !m_asks.empty()) {
+        auto bid_it = m_orders.find(m_bids.top().m_id);
+        if (bid_it == m_orders.end()) {
+            m_bids.pop();
+            continue;
+        }
+
+        auto ask_it = m_orders.find(m_asks.top().m_id);
+        if (ask_it == m_orders.end()) {
+            m_asks.pop();
+            continue;
+        }
+        
         auto& bid = bid_it->second;
         auto& ask = ask_it->second;
         if (bid.m_price < ask.m_price) {
@@ -40,10 +50,12 @@ void tradesim::market::update() {
         bid.m_quantity -= fulfilled;
         ask.m_quantity -= fulfilled;
         if (bid.m_quantity == 0) {
-            bid_it = m_bids.erase(bid_it);
+            m_orders.erase(bid_it);
+            m_bids.pop();
         }
         if (ask.m_quantity == 0) {
-            ask_it = m_asks.erase(ask_it);
+            m_orders.erase(ask_it);
+            m_asks.pop();
         }
     }
 }
@@ -70,7 +82,8 @@ void tradesim::market::place_bid(const object_id& trader_id, long price, long qu
         return;
     }
     order o = { ++m_order_count, trader_id, order_type::BID, price, quantity };
-    m_bids[{o.m_id, o.m_price}] = o;
+    m_orders[o.m_id] = o;
+    m_bids.push({o.m_id, o.m_price});
     m_price_points[price].m_bid_count += quantity;
     update();
 }
@@ -81,7 +94,8 @@ void tradesim::market::place_ask(const object_id& trader_id, long price, long qu
         return;
     }
     order o = { ++m_order_count, trader_id, order_type::ASK, price, quantity };
-    m_asks[{o.m_id, o.m_price}] = o;
+    m_orders[o.m_id] = o;
+    m_asks.push({o.m_id, o.m_price});
     m_price_points[price].m_ask_count += quantity;
     update();
 }
