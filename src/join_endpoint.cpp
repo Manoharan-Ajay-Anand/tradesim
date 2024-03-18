@@ -38,8 +38,8 @@ cppevent::awaitable_task<void> tradesim::join_endpoint::process(const cppevent::
     bool invalid_input = false;
     try {
         json j = json::parse(input.data(), input.data() + content_length);
-        market_id = j.at("market_id").get<object_id>();
-        trader_id = j.at("trader_id").get<object_id>();
+        market_id = j.at("marketId").get<object_id>();
+        trader_id = j.at("traderId").get<object_id>();
     } catch (...) {
         invalid_input = true;
     }
