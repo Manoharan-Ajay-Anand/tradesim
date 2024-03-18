@@ -19,6 +19,8 @@ public:
 
     bool create_market(const object_id& market_id);
 
+    bool join_market(const object_id& market_id, const object_id& trader_id);
+
     std::unique_ptr<subscription> subscribe(const object_id& market_id,
                                             const object_id& trader_id,
                                             cppevent::output* o);

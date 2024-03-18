@@ -8,6 +8,7 @@
 #include "exchange.hpp"
 #include "welcome_endpoint.hpp"
 #include "create_endpoint.hpp"
+#include "join_endpoint.hpp"
 #include "stream_endpoint.hpp"
 
 int main() {
@@ -17,11 +18,13 @@ int main() {
 
     tradesim::welcome_endpoint welcome;
     tradesim::create_endpoint create { ex };
+    tradesim::join_endpoint join { ex };
     tradesim::stream_endpoint stream { loop };
 
     cppevent::router routes;
     routes.get("/api", welcome);
     routes.post("/api/create", create);
+    routes.post("/api/join", join);
     routes.get("/api/stream", stream);
     
     cppevent::fcgi_server tradesim_server("/tmp/tradesim.sock", loop, routes);

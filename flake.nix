@@ -18,7 +18,7 @@
       };
       name = "tradesim-1.0";
       inherit system;
-      nativeBuildInputs = [pkgs.cmake libcppevent pkgs.doctest];
+      nativeBuildInputs = [pkgs.cmake libcppevent pkgs.doctest pkgs.nlohmann_json];
       buildInputs = [pkgs.liburing];
     };
     devShells.${system}.default = pkgs.mkShell {

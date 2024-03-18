@@ -1,6 +1,7 @@
 add_executable(tradesim 
     create_endpoint.cpp
     exchange.cpp
+    join_endpoint.cpp
     main.cpp
     market_types.cpp
     market.cpp

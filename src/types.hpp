@@ -1,11 +1,16 @@
 #ifndef TRADESIM_TYPES_HPP
 #define TRADESIM_TYPES_HPP
 
+#include <nlohmann/json.hpp>
+
 #include <array>
 #include <algorithm>
 #include <string_view>
+#include <string>
 
 namespace tradesim {
+
+using json = nlohmann::json;
 
 constexpr long MAX_ID_SIZE = 30; 
 
@@ -15,6 +20,8 @@ private:
     long m_size;
 
 public:
+    const object_id& operator=(const std::string& s);
+
     char* data();
 
     const char* data() const;
@@ -27,6 +34,10 @@ public:
 
     bool operator==(const tradesim::object_id& other) const;
 };
+
+void to_json(json& j, const object_id& o);
+
+void from_json(const json& j, object_id& o);
 
 }
 

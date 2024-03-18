@@ -3,12 +3,11 @@
 #include "types.hpp"
 #include "exchange.hpp"
 
-#include <array>
 #include <string_view>
 #include <format>
 
 constexpr std::string_view MARKET_ID_MAX_LENGTH_MESSAGE = 
-        "status: 400\ncontent-length: 31\ncontent-type: text/plain\n\nMax 20 characters for Market ID";
+        "status: 400\ncontent-length: 31\ncontent-type: text/plain\n\nMax 30 characters for Market ID";
 
 constexpr std::string_view MARKET_ID_EXISTS_MESSAGE = 
         "status: 400\ncontent-length: 24\ncontent-type: text/plain\n\nMarket ID already exists";
