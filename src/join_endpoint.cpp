@@ -3,14 +3,9 @@
 #include "types.hpp"
 #include "exchange.hpp"
 
-#include <array>
+#include <string>
 #include <string_view>
 #include <format>
-
-constexpr long MAX_CONTENT_LENGTH = 300;
-
-constexpr std::string_view MAX_CONTENT_LENGTH_MESSAGE = 
-        "status: 400\ncontent-length: 19\ncontent-type: text/plain\n\nMax 300 body length";
 
 constexpr std::string_view INVALID_INPUT_MESSAGE = 
         "status: 400\ncontent-length: 13\ncontent-type: text/plain\n\nInvalid Input";
@@ -25,19 +20,14 @@ cppevent::awaitable_task<void> tradesim::join_endpoint::process(const cppevent::
                                                                 cppevent::stream& s_stdin,
                                                                 cppevent::output& o_stdout) {
     long content_length = cont.get_content_len();
-    if (content_length > MAX_CONTENT_LENGTH) {
-        co_await o_stdout.write(MAX_CONTENT_LENGTH_MESSAGE);
-        co_return;
-    }
-
-    std::array<char, MAX_CONTENT_LENGTH> input;
-    co_await s_stdin.read(input.data(), content_length, true);
+    std::string input;
+    co_await s_stdin.read(input, content_length, true);
     
     object_id market_id;
     object_id trader_id;
     bool invalid_input = false;
     try {
-        json j = json::parse(input.data(), input.data() + content_length);
+        json j = json::parse(input);
         market_id = j.at("marketId").get<object_id>();
         trader_id = j.at("traderId").get<object_id>();
     } catch (...) {

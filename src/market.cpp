@@ -13,6 +13,28 @@ cppevent::awaitable_task<void> tradesim::market::broadcast_trades() {
     }
 }
 
+namespace tradesim {
+
+struct trade {
+    bool m_matched;
+    long m_price;
+    long m_quantity;
+
+    static trade match(const order& bid, const order& ask) {
+        if (bid.m_price < ask.m_price) {
+            return { false, 0, 0 };
+        }
+        long quantity = std::min(bid.m_quantity, ask.m_quantity);
+        long price = bid.m_price;
+        if (ask.m_id < bid.m_id) {
+            price = ask.m_price;
+        }
+        return { true, price, quantity };
+    }
+};
+
+}
+
 void tradesim::market::update() {
     while (!m_bids.empty() && !m_asks.empty()) {
         auto bid_it = m_orders.find(m_bids.top().m_id);
@@ -29,26 +51,22 @@ void tradesim::market::update() {
         
         auto& bid = bid_it->second;
         auto& ask = ask_it->second;
-        if (bid.m_price < ask.m_price) {
+
+        trade t = trade::match(bid, ask);
+        if (!t.m_matched) {
             break;
         }
 
-        long fulfilled = std::min(bid.m_quantity, ask.m_quantity);
-        long price = bid.m_price;
-        if (ask.m_id < bid.m_id) {
-            price = ask.m_price;
-        }
-
         auto& buyer = m_accounts.at(bid.m_trader);
-        buyer.confirm(order_type::BID, price, fulfilled);
+        buyer.confirm(order_type::BID, t.m_price, t.m_quantity);
         auto& seller = m_accounts.at(ask.m_trader);
-        seller.confirm(order_type::ASK, price, fulfilled);
+        seller.confirm(order_type::ASK, t.m_price, t.m_quantity);
 
-        m_price_points[bid.m_price].m_bid_count -= fulfilled;
-        m_price_points[ask.m_price].m_ask_count -= fulfilled;
+        m_price_points[bid.m_price].m_bid_count -= t.m_quantity;
+        m_price_points[ask.m_price].m_ask_count -= t.m_quantity;
 
-        bid.m_quantity -= fulfilled;
-        ask.m_quantity -= fulfilled;
+        bid.m_quantity -= t.m_quantity;
+        ask.m_quantity -= t.m_quantity;
         if (bid.m_quantity == 0) {
             m_orders.erase(bid_it);
             m_bids.pop();
