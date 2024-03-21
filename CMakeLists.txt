@@ -12,6 +12,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
 add_subdirectory(src)
 
 install(TARGETS tradesim)
+install(DIRECTORY srv/
+        DESTINATION ${CMAKE_INSTALL_SRVDIR})
 
 if (BUILD_TESTING)
     include(CTest)

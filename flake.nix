@@ -21,6 +21,24 @@
       inherit system;
       nativeBuildInputs = [pkgs.cmake libcppevent pkgs.doctest pkgs.nlohmann_json];
       buildInputs = [pkgs.liburing];
+      cmakeFlags = [
+        "-DCMAKE_INSTALL_SRVDIR=${out}/srv"
+      ];
+    };
+    packages.${system}.sample = pkgs.writeShellApplication {
+      name = "tradesim-sample-1.0";
+      runtimeInputs = [pkgs.h2o outpkgs.default];
+      text = ''
+        trap terminate SIGINT
+        terminate(){
+          pkill -SIGINT -P $$
+          exit
+        }
+        cd ${outpkgs.default}/srv &&
+        tradesim &
+        h2o -c h2o.conf &
+        wait
+      '';
     };
     devShells.${system}.default = pkgs.mkShell {
       packages = [pkgs.gdb];
