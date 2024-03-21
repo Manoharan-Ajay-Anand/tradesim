@@ -35,9 +35,8 @@
             pkill -SIGINT -P $$
             exit
           }
-          cd ${outpkgs.default}/srv &&
           tradesim &
-          h2o -c h2o.conf &
+          (cd ${outpkgs.default}/srv && h2o -c h2o.conf) &
           wait
         '';
       };
