@@ -11,6 +11,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
 
 add_subdirectory(src)
 
+set(CMAKE_INSTALL_SRVDIR /srv CACHE PATH "Path to install web files")
+
 install(TARGETS tradesim)
 install(DIRECTORY srv/
         DESTINATION ${CMAKE_INSTALL_SRVDIR})
