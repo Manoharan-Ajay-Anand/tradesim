@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1710860880,
-        "narHash": "sha256-encuJ81cDgzBQfmKnaK786WvhejA4b/atmmTa/cdPl8=",
+        "lastModified": 1710999103,
+        "narHash": "sha256-o9u6fkQjPHSMap3ing01TKOwGlEaM2YGwnrPZN1HtGw=",
         "owner": "Manoharan-Ajay-Anand",
         "repo": "cppevent",
-        "rev": "ca8e7cb12603d4ab3aca234dc1e9c1147b41bba3",
+        "rev": "95e4554f4253b7e864968b8764354e928de4bf34",
         "type": "github"
       },
       "original": {
@@ -22,11 +22,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1710860368,
-        "narHash": "sha256-BXQZC6xgvzOf/x0cHOM2sCqRI7+hGdh1fuGBZh5ew9I=",
+        "lastModified": 1710998384,
+        "narHash": "sha256-Tgbpcs2JHQIbcdCU+JwaGHCM/lCkqe0N+Hoje3FUy6w=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "5171ed6431dcc22e6bd5c8b1edd11311d9e7a82c",
+        "rev": "aebd4702ad00852acd4bb339911c1e65222bb66d",
         "type": "github"
       },
       "original": {

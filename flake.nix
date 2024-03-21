@@ -11,6 +11,7 @@
     system = "x86_64-linux";
     pkgs = import nixpkgs {inherit system;};
     libcppevent = cppevent.packages.${system}.default;
+    outpkgs = self.packages.${system};
   in {
     packages.${system}.default = pkgs.stdenv.mkDerivation {
       src = builtins.path {
@@ -23,9 +24,9 @@
     };
     devShells.${system}.default = pkgs.mkShell {
       packages = [pkgs.gdb];
-      inputsFrom = [self.packages.${system}.default];
+      inputsFrom = [outpkgs.default];
       shellHook = ''
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -B build -S .
+        cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -B build -S .
       '';
     };
   };

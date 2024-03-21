@@ -13,7 +13,8 @@ add_subdirectory(src)
 
 install(TARGETS tradesim)
 
-include(CTest)
-
-add_subdirectory(test)
-target_include_directories(tradesim_test PRIVATE src)
+if (BUILD_TESTING)
+    include(CTest)
+    add_subdirectory(test)
+    target_include_directories(tradesim_test PRIVATE src)
+endif()
