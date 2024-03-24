@@ -1,16 +1,29 @@
 #include "market.hpp"
 
-tradesim::market::market(cppevent::event_loop& el): m_aq(el), m_task(broadcast_trades()) {
+constexpr std::string_view PRICE_POINT_MSG = "pricePoint";
+
+tradesim::market::market(cppevent::event_loop& el): m_messages(el), m_task(broadcast_messages()) {
     m_order_count = 0;
 }
 
-cppevent::awaitable_task<void> tradesim::market::broadcast_trades() {
-    while (true) {
-        long count = co_await m_aq.await_items();
-        for (long i = 0; i < count; ++i) {
-            m_aq.pop();
-        }
+cppevent::awaitable_task<void> tradesim::market::broadcast_messages() {
+    while ((co_await m_messages.await_items()) > 0) {
+        auto& msg = m_messages.front();
+        co_await m_broadcast.send_msg(msg);
+        m_messages.pop();
     }
+}
+
+void tradesim::market::update_bid_count(long price, long diff) {
+    auto& price_point = (m_price_points.try_emplace(price, price, 0, 0).first)->second;
+    price_point.m_bid_count += diff;
+    m_messages.push({ {}, PRICE_POINT_MSG, json { price_point }.dump() });
+}
+
+void tradesim::market::update_ask_count(long price, long diff) {
+    auto& price_point = (m_price_points.try_emplace(price, price, 0, 0).first)->second;
+    price_point.m_ask_count += diff;
+    m_messages.push({ {}, PRICE_POINT_MSG, json { price_point }.dump() });
 }
 
 namespace tradesim {
@@ -35,7 +48,7 @@ struct trade {
 
 }
 
-void tradesim::market::update() {
+void tradesim::market::execute_trades() {
     while (!m_bids.empty() && !m_asks.empty()) {
         auto bid_it = m_orders.find(m_bids.top().m_id);
         if (bid_it == m_orders.end()) {
@@ -62,8 +75,8 @@ void tradesim::market::update() {
         auto& seller = m_accounts.at(ask.m_trader);
         seller.confirm(order_type::ASK, t.m_price, t.m_quantity);
 
-        m_price_points[bid.m_price].m_bid_count -= t.m_quantity;
-        m_price_points[ask.m_price].m_ask_count -= t.m_quantity;
+        update_bid_count(bid.m_price, 0 - t.m_quantity);
+        update_ask_count(ask.m_price, 0 - t.m_quantity);
 
         bid.m_quantity -= t.m_quantity;
         ask.m_quantity -= t.m_quantity;
@@ -102,8 +115,8 @@ void tradesim::market::place_bid(const object_id& trader_id, long price, long qu
     order o = { ++m_order_count, trader_id, order_type::BID, price, quantity };
     m_orders[o.m_id] = o;
     m_bids.push({o.m_id, o.m_price});
-    m_price_points[price].m_bid_count += quantity;
-    update();
+    update_bid_count(price, quantity);
+    execute_trades();
 }
 
 void tradesim::market::place_ask(const object_id& trader_id, long price, long quantity) {
@@ -114,6 +127,6 @@ void tradesim::market::place_ask(const object_id& trader_id, long price, long qu
     order o = { ++m_order_count, trader_id, order_type::ASK, price, quantity };
     m_orders[o.m_id] = o;
     m_asks.push({o.m_id, o.m_price});
-    m_price_points[price].m_ask_count += quantity;
-    update();
+    update_ask_count(price, quantity);
+    execute_trades();
 }

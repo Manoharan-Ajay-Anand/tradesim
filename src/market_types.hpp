@@ -43,9 +43,12 @@ using bid_queue = std::priority_queue<order_key, std::vector<order_key>, bid_com
 using ask_queue = std::priority_queue<order_key, std::vector<order_key>, ask_compare>;
 
 struct price_point {
-    long m_bid_count = 0;
-    long m_ask_count = 0;
+    long m_price;
+    long m_bid_count;
+    long m_ask_count;
 };
+
+void to_json(json& j, const price_point& pp);
 
 class position {
 private:

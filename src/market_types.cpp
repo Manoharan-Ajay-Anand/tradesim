@@ -1,5 +1,9 @@
 #include "market_types.hpp"
 
+void tradesim::to_json(json& j, const price_point& pp) {
+    j = json { { "price", pp.m_price }, { "bids", pp.m_bid_count }, { "asks", pp.m_ask_count } };
+}
+
 long tradesim::position::get_pnl() const {
     return m_pnl;
 }

@@ -9,7 +9,6 @@
 #include <cppevent_base/async_queue.hpp>
 
 #include <unordered_map>
-#include <list>
 #include <memory>
 
 namespace cppevent {
@@ -32,12 +31,15 @@ private:
     bid_queue m_bids;
     ask_queue m_asks;
 
-    cppevent::async_queue<long> m_aq;
+    cppevent::async_queue<message> m_messages;
     cppevent::awaitable_task<void> m_task;
 
-    cppevent::awaitable_task<void> broadcast_trades();
+    cppevent::awaitable_task<void> broadcast_messages();
 
-    void update();
+    void update_bid_count(long price, long diff);
+    void update_ask_count(long price, long diff);
+
+    void execute_trades();
 public:
     market(cppevent::event_loop& el);
 

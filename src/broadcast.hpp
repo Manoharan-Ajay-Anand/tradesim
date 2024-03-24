@@ -3,9 +3,14 @@
 
 #include "types.hpp"
 
+#include <cppevent_base/task.hpp>
+
 #include <unordered_map>
 #include <list>
 #include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
 
 namespace cppevent {
 
@@ -33,6 +38,12 @@ public:
     subscription& operator=(subscription&&) = delete;
 };
 
+struct message {
+    std::optional<object_id> m_recipient_opt;
+    std::string_view m_type;
+    std::string m_content;
+};
+
 class broadcast {
 private:
     std::list<cppevent::output*> m_outputs;
@@ -40,6 +51,8 @@ private:
 public:
     std::unique_ptr<subscription> subscribe(const object_id& id, cppevent::output* o);
     void unsubscribe(const object_id& id);
+
+    cppevent::awaitable_task<void> send_msg(const message& msg);
 };
 
 }
