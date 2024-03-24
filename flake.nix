@@ -1,7 +1,7 @@
 {
   description = "Nix flake for tradesim";
 
-  inputs.nixpkgs.url = github:NixOS/nixpkgs;
+  inputs.nixpkgs.url = github:NixOS/nixpkgs/release-23.11;
   inputs.cppevent = {
     url = github:Manoharan-Ajay-Anand/cppevent;
     inputs.nixpkgs.follows = "nixpkgs";
