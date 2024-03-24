@@ -4,7 +4,7 @@
 #include <cstring>
 #include <stdexcept>
 
-const tradesim::object_id& tradesim::object_id::operator=(const std::string& s) {
+const tradesim::object_id& tradesim::object_id::operator=(std::string_view s) {
     m_size = s.size();
     std::memcpy(data(), s.data(), m_size);
     return *this;
@@ -43,5 +43,5 @@ void tradesim::from_json(const json& j, object_id& o) {
     if (s.size() > MAX_ID_SIZE) {
         throw std::runtime_error("ID > 30 characters");
     }
-    o = s;
+    o = std::string_view { s };
 }

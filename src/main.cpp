@@ -19,13 +19,13 @@ int main() {
     tradesim::welcome_endpoint welcome;
     tradesim::create_endpoint create { ex };
     tradesim::join_endpoint join { ex };
-    tradesim::stream_endpoint stream { loop };
+    tradesim::stream_endpoint stream { ex, loop };
 
     cppevent::router routes;
     routes.get("/api", welcome);
     routes.post("/api/create", create);
     routes.post("/api/join", join);
-    routes.get("/api/stream", stream);
+    routes.get("/api/stream/{marketId}/{traderId}", stream);
     
     cppevent::fcgi_server tradesim_server("/tmp/tradesim.sock", loop, routes);
 

@@ -6,7 +6,6 @@
 #include <array>
 #include <algorithm>
 #include <string_view>
-#include <string>
 
 namespace tradesim {
 
@@ -20,7 +19,7 @@ private:
     long m_size;
 
 public:
-    const object_id& operator=(const std::string& s);
+    const object_id& operator=(std::string_view s);
 
     char* data();
 

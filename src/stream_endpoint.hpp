@@ -11,12 +11,14 @@ class event_loop;
 
 namespace tradesim {
 
+class exchange;
+
 class stream_endpoint : public cppevent::endpoint {
 private:
     cppevent::event_loop& m_loop;
-    bool m_wait_longer;
+    exchange& m_exchange;
 public:
-    stream_endpoint(cppevent::event_loop& loop);
+    stream_endpoint(exchange& ex, cppevent::event_loop& loop);
 
     cppevent::awaitable_task<void> process(const cppevent::context& cont,
                                                  cppevent::stream& s_stdin,
