@@ -42,10 +42,14 @@ cppevent::awaitable_task<void> tradesim::stream_endpoint::process(const cppevent
 
     co_await o_stdout.write("status: 200\ncontent-type: text/event-stream\n\n");
 
-    std::unique_ptr<subscription> sub = m_exchange.subscribe(market_id, trader_id, &o_stdout);
+    {
+        std::unique_ptr<subscription> sub = m_exchange.subscribe(market_id, trader_id, &o_stdout);
+        if (sub) {
+            std::chrono::minutes wait_time = 1min;
+            cppevent::timer t { wait_time, m_loop };
+            co_await t.wait();
+        }
+    }
 
-    std::chrono::minutes wait_time = 5min;
-    cppevent::timer t { wait_time, m_loop };
-
-    co_await t.wait();
+    co_await o_stdout.write("event: close\ndata: {}\n\n");
 }

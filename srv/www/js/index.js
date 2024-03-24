@@ -1,12 +1,12 @@
 const createButton = document.getElementById("createButton");
-createButton.addEventListener("click", createMarket)
+createButton.addEventListener("click", onClickCreate)
 
 const joinButton = document.getElementById("joinButton");
-joinButton.addEventListener("click", joinMarket);
+joinButton.addEventListener("click", onClickJoin);
 
 const marketInput = document.getElementById("marketInput");
 
-async function createMarket(elem, event) {
+async function onClickCreate(elem, event) {
     const marketId = marketInput.value;
     
     const request = new Request("/api/create", { method: "POST", body: marketId });
@@ -17,7 +17,7 @@ async function createMarket(elem, event) {
         return;
     }
 
-    console.log(message);
+    await joinMarket(marketId);
 }
 
 function decToHex(num) {
@@ -30,8 +30,13 @@ function getRandomString(len) {
     return Array.from(arr, decToHex).join("");
 }
 
-async function joinMarket(elem, event) {
-    const form = { marketId: marketInput.value, traderId: getRandomString(30) };
+function onClickJoin() {
+    joinMarket(marketInput.value);
+}
+
+async function joinMarket(marketId) {
+    const traderId = getRandomString(30);
+    const form = { marketId: marketId, traderId: traderId };
     const request = new Request("/api/join", { method: "POST", body: JSON.stringify(form) });
     const response = await fetch(request);
     const message = await response.text(); 
@@ -40,5 +45,5 @@ async function joinMarket(elem, event) {
         return;
     }
 
-    console.log(message);
+    window.open("/market.html?marketId=" + marketId + "&traderId=" + traderId);
 }
