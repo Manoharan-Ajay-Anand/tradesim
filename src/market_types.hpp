@@ -13,6 +13,16 @@ enum class order_type {
     ASK = -1
 };
 
+struct order_form {
+    object_id m_market_id;
+    object_id m_trader_id;
+    order_type m_type;
+    long m_price;
+    long m_quantity;
+};
+
+void from_json(const json& j, order_form& o);
+
 struct order_key {
     long m_id;
     long m_price;

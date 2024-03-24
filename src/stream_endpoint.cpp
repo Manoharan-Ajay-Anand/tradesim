@@ -10,13 +10,16 @@
 
 using namespace std::chrono_literals;
 
-tradesim::stream_endpoint::stream_endpoint(exchange& ex, cppevent::event_loop& loop): m_exchange(ex),
-                                                                                      m_loop(loop) {
+constexpr std::string_view INVALID_MARKET_ID =
+    "status: 400\ncontent-length: 17\ncontent-type: text/plain\n\nInvalid Market ID";
+
+constexpr std::string_view INVALID_TRADER_ID =
+    "status: 400\ncontent-length: 17\ncontent-type: text/plain\n\nInvalid Trader ID";
+
+
+tradesim::stream_endpoint::stream_endpoint(exchange& e, cppevent::event_loop& loop): m_exchange(e),
+                                                                                     m_loop(loop) {
 }
-
-constexpr std::string_view INVALID_MARKET_ID = "status: 400\ncontent-length: 17\ncontent-type: text/plain\n\nInvalid Market ID";
-
-constexpr std::string_view INVALID_TRADER_ID = "status: 400\ncontent-length: 17\ncontent-type: text/plain\n\nInvalid Trader ID";
 
 cppevent::awaitable_task<void> tradesim::stream_endpoint::process(const cppevent::context& cont,
                                                                   cppevent::stream& s_stdin,

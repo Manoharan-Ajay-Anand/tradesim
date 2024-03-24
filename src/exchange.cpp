@@ -25,3 +25,20 @@ std::unique_ptr<tradesim::subscription> tradesim::exchange::subscribe(const obje
     }
     return (it->second).subscribe(trader_id, o);
 }
+
+bool tradesim::exchange::place_order(const order_form& form) {
+    auto it = m_markets.find(form.m_market_id);
+    if (it == m_markets.end()) {
+        return false;
+    }
+    market& m = it->second;
+    switch (form.m_type) {
+        case order_type::BID:
+            m.place_bid(form.m_trader_id, form.m_price, form.m_quantity);
+            break;
+        case order_type::ASK:
+            m.place_ask(form.m_trader_id, form.m_price, form.m_quantity);
+            break;
+    }
+    return true;
+}

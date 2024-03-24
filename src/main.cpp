@@ -10,6 +10,7 @@
 #include "create_endpoint.hpp"
 #include "join_endpoint.hpp"
 #include "stream_endpoint.hpp"
+#include "order_endpoint.hpp"
 
 int main() {
     cppevent::event_loop loop;
@@ -20,13 +21,15 @@ int main() {
     tradesim::create_endpoint create { ex };
     tradesim::join_endpoint join { ex };
     tradesim::stream_endpoint stream { ex, loop };
+    tradesim::order_endpoint order { ex };
 
     cppevent::router routes;
     routes.get("/api", welcome);
     routes.post("/api/create", create);
     routes.post("/api/join", join);
     routes.get("/api/stream/{marketId}/{traderId}", stream);
-    
+    routes.post("/api/order", order);
+
     cppevent::fcgi_server tradesim_server("/tmp/tradesim.sock", loop, routes);
 
     loop.run();

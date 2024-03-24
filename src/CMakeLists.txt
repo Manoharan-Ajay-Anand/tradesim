@@ -5,6 +5,7 @@ add_executable(tradesim
     main.cpp
     market_types.cpp
     market.cpp
+    order_endpoint.cpp
     stream_endpoint.cpp
     broadcast.cpp
     types.cpp
