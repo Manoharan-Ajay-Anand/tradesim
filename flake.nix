@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = github:NixOS/nixpkgs/release-23.11;
 
-  outputs = { self, nixpkgs, cppevent }: let
+  outputs = { self, nixpkgs }: let
     system = "x86_64-linux";
     pkgs = import nixpkgs {inherit system;};
     outpkgs = self.packages.${system};
