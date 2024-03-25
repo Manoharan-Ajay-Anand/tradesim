@@ -16,6 +16,7 @@ evtSource.addEventListener("pricePoint", (event) => {
 
 evtSource.addEventListener("close", () => {
     console.log("evt source closed");
+    evtSource.close();
 });
 
 const bidForm = { marketId: marketId, traderId: traderId, type: "bid", price: 100, quantity: 10 };

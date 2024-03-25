@@ -35,19 +35,15 @@ void tradesim::broadcast::unsubscribe(const object_id& id) {
 
 cppevent::awaitable_task<void> tradesim::broadcast::send_msg(const message& msg) {
     std::string response = std::format("event: {}\ndata: {}\n\n", msg.m_type, msg.m_content);
-    std::vector<cppevent::status_awaiter> awaiters;
     if (msg.m_recipient_opt) {
         auto it = m_output_map.find(msg.m_recipient_opt.value());
         if (it != m_output_map.end()) {
             cppevent::output* o_ptr = *(it->second); 
-            awaiters.push_back(o_ptr->write(response));
+            co_await o_ptr->write(response);
         }
     } else {
         for (auto o_ptr : m_outputs) {
-            awaiters.push_back(o_ptr->write(response));
+            co_await o_ptr->write(response);
         }
-    }
-    for (auto it = awaiters.rbegin(); it != awaiters.rend(); ++it) {
-        co_await *it;
     }
 }

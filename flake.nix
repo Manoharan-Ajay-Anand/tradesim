@@ -2,15 +2,10 @@
   description = "Nix flake for tradesim";
 
   inputs.nixpkgs.url = github:NixOS/nixpkgs/release-23.11;
-  inputs.cppevent = {
-    url = github:Manoharan-Ajay-Anand/cppevent;
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
 
   outputs = { self, nixpkgs, cppevent }: let
     system = "x86_64-linux";
     pkgs = import nixpkgs {inherit system;};
-    libcppevent = cppevent.packages.${system}.default;
     outpkgs = self.packages.${system};
   in {
     packages.${system} = {
@@ -20,7 +15,7 @@
         };
         name = "tradesim-1.0";
         inherit system;
-        nativeBuildInputs = [pkgs.cmake libcppevent pkgs.doctest pkgs.nlohmann_json];
+        nativeBuildInputs = [pkgs.cmake pkgs.doctest pkgs.nlohmann_json];
         buildInputs = [pkgs.liburing];
         cmakeFlags = [
           "-DCMAKE_INSTALL_SRVDIR=${placeholder "out"}/srv"
