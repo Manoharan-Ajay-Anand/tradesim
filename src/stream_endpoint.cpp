@@ -48,6 +48,9 @@ cppevent::awaitable_task<void> tradesim::stream_endpoint::process(const cppevent
             std::chrono::minutes wait_time = 1min;
             cppevent::timer t { wait_time, m_loop };
             co_await t.wait();
+        } else {
+            co_await o_stdout.write("event: duplicate\ndata: {}\n\n");
+            co_return;
         }
     }
 

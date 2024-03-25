@@ -14,8 +14,8 @@ evtSource.addEventListener("pricePoint", (event) => {
     console.log(pp);
 });
 
-evtSource.addEventListener("close", () => {
-    console.log("evt source closed");
+evtSource.addEventListener("duplicate", () => {
+    alert("Only one stream allowed per trader");
     evtSource.close();
 });
 
