@@ -16,7 +16,7 @@ constexpr long MAX_ID_SIZE = 30;
 class object_id {
 private:
     std::array<char, MAX_ID_SIZE> m_arr;
-    long m_size;
+    long m_size = 0;
 
 public:
     const object_id& operator=(std::string_view s);

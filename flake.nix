@@ -37,7 +37,7 @@
       };
     };
     devShells.${system}.default = pkgs.mkShell {
-      packages = [pkgs.gdb];
+      packages = [pkgs.gdb pkgs.valgrind];
       inputsFrom = [outpkgs.default];
       shellHook = ''
         cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -B build -S .
