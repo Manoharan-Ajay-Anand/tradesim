@@ -9,7 +9,7 @@
     outpkgs = self.packages.${system};
   in {
     packages.${system} = {
-      default = pkgs.stdenv.mkDerivation {
+      default = pkgs.gcc13Stdenv.mkDerivation {
         src = builtins.path {
           path = ./.;
         };
@@ -36,7 +36,7 @@
         '';
       };
     };
-    devShells.${system}.default = pkgs.mkShell {
+    devShells.${system}.default = (pkgs.mkShell.override { stdenv = pkgs.gcc13Stdenv; }) {
       packages = [pkgs.gdb pkgs.valgrind pkgs.h2o];
       inputsFrom = [outpkgs.default];
       shellHook = ''

@@ -1,5 +1,8 @@
 #include "market.hpp"
 
+#include <stdexcept>
+#include <iostream>
+
 constexpr std::string_view PRICE_POINT_MSG = "pricePoint";
 
 tradesim::market::market(cppevent::event_loop& el): m_messages(el), m_task(broadcast_messages()) {
@@ -9,7 +12,11 @@ tradesim::market::market(cppevent::event_loop& el): m_messages(el), m_task(broad
 cppevent::awaitable_task<void> tradesim::market::broadcast_messages() {
     while ((co_await m_messages.await_items()) > 0) {
         auto& msg = m_messages.front();
-        co_await m_broadcast.send_msg(msg);
+        try {
+            co_await m_broadcast.send_msg(msg);
+        } catch (std::runtime_error e) {
+            std::cerr << e.what() << std::endl;
+        }
         m_messages.pop();
     }
 }

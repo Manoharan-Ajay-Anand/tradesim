@@ -18,7 +18,6 @@ tradesim::subscription::~subscription() {
 
 std::unique_ptr<tradesim::subscription> tradesim::broadcast::subscribe(const object_id& id,
                                                                        cppevent::output* o) {
-    std::cerr << "subscribed: " << id.get_view() << std::endl;
     auto it = m_output_map.find(id);
     if (it != m_output_map.end()) {
         return {};
@@ -28,7 +27,6 @@ std::unique_ptr<tradesim::subscription> tradesim::broadcast::subscribe(const obj
 }
 
 void tradesim::broadcast::unsubscribe(const object_id& id) {
-    std::cerr << "unsubscribed: " << id.get_view() << std::endl;
     auto it = m_output_map.find(id);
     if (it != m_output_map.end()) {
         m_outputs.erase(it->second);
