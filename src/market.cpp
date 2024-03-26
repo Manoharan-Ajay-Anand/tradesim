@@ -18,14 +18,14 @@ void tradesim::market::update_bid_count(long price, long diff) {
     auto& price_point = (m_price_points.try_emplace(price, price, 0, 0).first)->second;
     price_point.m_bid_count += diff;
     json j = price_point;
-    m_messages.push({ {}, PRICE_POINT_MSG, j.dump() });
+    m_messages.push(message { {}, PRICE_POINT_MSG, j.dump() });
 }
 
 void tradesim::market::update_ask_count(long price, long diff) {
     auto& price_point = (m_price_points.try_emplace(price, price, 0, 0).first)->second;
     price_point.m_ask_count += diff;
     json j = price_point;
-    m_messages.push({ {}, PRICE_POINT_MSG, j.dump() });
+    m_messages.push(message { {}, PRICE_POINT_MSG, j.dump() });
 }
 
 namespace tradesim {
