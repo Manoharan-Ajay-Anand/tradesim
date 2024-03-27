@@ -42,17 +42,18 @@ cppevent::awaitable_task<void> tradesim::stream_endpoint::process(const cppevent
 
     co_await o_stdout.write("status: 200\ncontent-type: text/event-stream\n\n");
 
-    {
-        std::unique_ptr<subscription> sub = m_exchange.subscribe(market_id, trader_id, &o_stdout);
-        if (sub) {
-            std::chrono::minutes wait_time = 1min;
-            cppevent::timer t { wait_time, m_loop };
-            co_await t.wait();
-        } else {
-            co_await o_stdout.write("event: duplicate\ndata: {}\n\n");
-            co_return;
-        }
+    market_stream stream { m_loop };
+
+    std::unique_ptr<subscription> sub = m_exchange.subscribe(market_id, trader_id, &stream);
+    if (!sub) {
+        co_await o_stdout.write("event: duplicate\ndata: {}\n\n");
+        co_return;
     }
 
-    co_await o_stdout.write("event: close\ndata: {}\n\n");
+    while ((co_await stream.await_items()) > 0) {
+        std::string& msg = stream.front();
+        co_await o_stdout.write(msg);
+        stream.pop();
+    }
+
 }

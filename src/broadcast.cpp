@@ -17,34 +17,34 @@ tradesim::subscription::~subscription() {
 }
 
 std::unique_ptr<tradesim::subscription> tradesim::broadcast::subscribe(const object_id& id,
-                                                                       cppevent::output* o) {
-    auto it = m_output_map.find(id);
-    if (it != m_output_map.end()) {
+                                                                       market_stream* s_ptr) {
+    auto it = m_stream_map.find(id);
+    if (it != m_stream_map.end()) {
         return {};
     }
-    m_output_map[id] = m_outputs.insert(m_outputs.end(), o);
+    m_stream_map[id] = m_streams.insert(m_streams.end(), s_ptr);
     return std::make_unique<subscription>(*this, id);
 }
 
 void tradesim::broadcast::unsubscribe(const object_id& id) {
-    auto it = m_output_map.find(id);
-    if (it != m_output_map.end()) {
-        m_outputs.erase(it->second);
-        m_output_map.erase(it);
+    auto it = m_stream_map.find(id);
+    if (it != m_stream_map.end()) {
+        m_streams.erase(it->second);
+        m_stream_map.erase(it);
     }
 }
 
-cppevent::awaitable_task<void> tradesim::broadcast::send_msg(const message& msg) {
+void tradesim::broadcast::send_msg(const message& msg) {
     std::string response = std::format("event: {}\ndata: {}\n\n", msg.m_type, msg.m_content);
     if (msg.m_recipient_opt) {
-        auto it = m_output_map.find(msg.m_recipient_opt.value());
-        if (it != m_output_map.end()) {
-            cppevent::output* o_ptr = *(it->second); 
-            co_await o_ptr->write(response);
+        auto it = m_stream_map.find(msg.m_recipient_opt.value());
+        if (it != m_stream_map.end()) {
+            market_stream* m_ptr = *(it->second); 
+            m_ptr->push(response);
         }
     } else {
-        for (auto o_ptr : m_outputs) {
-            co_await o_ptr->write(response);
+        for (auto m_ptr : m_streams) {
+            m_ptr->push(response);
         }
     }
 }

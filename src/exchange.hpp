@@ -23,7 +23,7 @@ public:
 
     std::unique_ptr<subscription> subscribe(const object_id& market_id,
                                             const object_id& trader_id,
-                                            cppevent::output* o);
+                                            market_stream* m_ptr);
     
     bool place_order(const order_form& form);
 };

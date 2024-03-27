@@ -11,12 +11,8 @@ tradesim::market::market(cppevent::event_loop& el): m_messages(el), m_task(broad
 
 cppevent::awaitable_task<void> tradesim::market::broadcast_messages() {
     while ((co_await m_messages.await_items()) > 0) {
-        auto& msg = m_messages.front();
-        try {
-            co_await m_broadcast.send_msg(msg);
-        } catch (std::runtime_error e) {
-            std::cerr << e.what() << std::endl;
-        }
+        message& msg = m_messages.front();
+        m_broadcast.send_msg(msg);
         m_messages.pop();
     }
 }
@@ -105,11 +101,11 @@ void tradesim::market::register_account(const object_id& trader_id) {
 }
 
 std::unique_ptr<tradesim::subscription> tradesim::market::subscribe(const object_id& trader_id,
-                                                                    cppevent::output* o) {
+                                                                    market_stream* m_ptr) {
     if (m_accounts.find(trader_id) == m_accounts.end()) {
         return {};
     }
-    return m_broadcast.subscribe(trader_id, o);
+    return m_broadcast.subscribe(trader_id, m_ptr);
 }
 
 void tradesim::market::unsubscribe(const object_id& trader_id) {

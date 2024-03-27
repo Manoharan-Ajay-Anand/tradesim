@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 
-#include <cppevent_base/task.hpp>
+#include <cppevent_base/async_queue.hpp>
 
 #include <unordered_map>
 #include <list>
@@ -11,12 +11,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-
-namespace cppevent {
-
-class output;
-
-}
 
 namespace tradesim {
 
@@ -46,13 +40,13 @@ struct message {
 
 class broadcast {
 private:
-    std::list<cppevent::output*> m_outputs;
-    std::unordered_map<object_id, std::list<cppevent::output*>::iterator> m_output_map;
+    std::list<market_stream*> m_streams;
+    std::unordered_map<object_id, std::list<market_stream*>::iterator> m_stream_map;
 public:
-    std::unique_ptr<subscription> subscribe(const object_id& id, cppevent::output* o);
+    std::unique_ptr<subscription> subscribe(const object_id& id, market_stream* s_ptr);
     void unsubscribe(const object_id& id);
 
-    cppevent::awaitable_task<void> send_msg(const message& msg);
+    void send_msg(const message& msg);
 };
 
 }

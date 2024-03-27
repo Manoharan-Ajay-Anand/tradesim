@@ -18,12 +18,12 @@ bool tradesim::exchange::join_market(const object_id& market_id, const object_id
 
 std::unique_ptr<tradesim::subscription> tradesim::exchange::subscribe(const object_id& market_id,
                                                                       const object_id& trader_id,
-                                                                      cppevent::output* o) {
+                                                                      market_stream* m_ptr) {
     auto it = m_markets.find(market_id);
     if (it == m_markets.end()) {
         return {};
     }
-    return (it->second).subscribe(trader_id, o);
+    return (it->second).subscribe(trader_id, m_ptr);
 }
 
 bool tradesim::exchange::place_order(const order_form& form) {

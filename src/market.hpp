@@ -51,7 +51,7 @@ public:
 
     void register_account(const object_id& trader_id);
 
-    std::unique_ptr<subscription> subscribe(const object_id& trader_id, cppevent::output* o);
+    std::unique_ptr<subscription> subscribe(const object_id& trader_id, market_stream* m_ptr);
     void unsubscribe(const object_id& trader_id);
 
     void place_bid(const object_id& trader_id, long price, long quantity);

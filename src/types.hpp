@@ -3,9 +3,13 @@
 
 #include <nlohmann/json.hpp>
 
+#include <cppevent_base/async_queue.hpp>
+
 #include <array>
 #include <algorithm>
 #include <string_view>
+#include <string>
+#include <optional>
 
 namespace tradesim {
 
@@ -37,6 +41,8 @@ public:
 void to_json(json& j, const object_id& o);
 
 void from_json(const json& j, object_id& o);
+
+using market_stream = cppevent::async_queue<std::string>; 
 
 }
 
