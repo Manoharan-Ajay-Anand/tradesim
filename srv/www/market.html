@@ -3,10 +3,31 @@
 <head>
     <title>TradeSim - Market</title>
     <link rel="stylesheet" href="css/market.css">
+    <link rel="stylesheet" href="css/common.css">
 </head>
 <body>
     <div id="statBox"></div>
-    <div id="priceBox"></div>
+    <table id="priceBox">
+        <tr>
+            <td class="zero-padding">
+                <table class="full-width">
+                    <tr>
+                        <th class="cell-header">Bids</th>
+                        <th class="cell-header">Price</th>
+                        <th class="cell-header">Asks</th>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="zero-padding">
+                <div id="priceScrollDiv">
+                    <table id="priceTable" class="full-width">
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
     <div id="orderBox"></div>
     <script src="js/market.js"></script>
 </body>
