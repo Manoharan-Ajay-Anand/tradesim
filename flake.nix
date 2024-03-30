@@ -9,6 +9,7 @@
     pkgs = import nixpkgs {inherit system;};
     libcppevent = cppevent.packages.${system}.default;
     outpkgs = self.packages.${system};
+    externalLibs = [pkgs.doctest pkgs.nlohmann_json pkgs.liburing];
   in {
     packages.${system} = {
       default = pkgs.gcc13Stdenv.mkDerivation {
@@ -17,8 +18,8 @@
         };
         name = "tradesim-1.0";
         inherit system;
-        nativeBuildInputs = [pkgs.cmake pkgs.doctest pkgs.nlohmann_json libcppevent];
-        buildInputs = [pkgs.liburing];
+        nativeBuildInputs = [pkgs.cmake];
+        buildInputs = [libcppevent] ++ externalLibs;
         cmakeFlags = [
           "-DCMAKE_INSTALL_SRVDIR=${placeholder "out"}/srv"
         ];
@@ -39,7 +40,7 @@
       };
     };
     devShells.${system}.default = (pkgs.mkShell.override { stdenv = pkgs.gcc13Stdenv; }) {
-      packages = [pkgs.cmake pkgs.doctest pkgs.nlohmann_json pkgs.liburing pkgs.gdb pkgs.valgrind pkgs.h2o];
+      packages = [pkgs.cmake pkgs.gdb pkgs.valgrind pkgs.h2o] ++ externalLibs;
       shellHook = ''
         cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -B build -S .
       '';
