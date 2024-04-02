@@ -5,11 +5,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1711616307,
-        "narHash": "sha256-LDztFVJEhZ9kfWv26Blh6OZrkA+AS3oSlfv2Dip0fwQ=",
+        "lastModified": 1712026622,
+        "narHash": "sha256-iTW7f/TXK11ggveXVjW5NNTYNXeP9q/jz1UcT6vvkPY=",
         "owner": "Manoharan-Ajay-Anand",
         "repo": "cppevent",
-        "rev": "202075d9a60e1fbefac5f6df845e829351576365",
+        "rev": "68f530d002247950402b3969a1fe2a45b28dc877",
         "type": "github"
       },
       "original": {
