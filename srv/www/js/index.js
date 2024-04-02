@@ -45,5 +45,5 @@ async function joinMarket(marketId) {
         return;
     }
 
-    window.open("/market.html?marketId=" + marketId + "&traderId=" + traderId);
+    window.open("market.html?marketId=" + marketId + "&traderId=" + traderId);
 }
