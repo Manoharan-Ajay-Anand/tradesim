@@ -1,3 +1,0 @@
-[submodule "libs/cppevent"]
-	path = libs/cppevent
-	url = ../cppevent.git
