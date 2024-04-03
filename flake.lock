@@ -1,39 +1,6 @@
 {
   "nodes": {
-    "cppevent": {
-      "inputs": {
-        "nixpkgs": "nixpkgs"
-      },
-      "locked": {
-        "lastModified": 1712026622,
-        "narHash": "sha256-iTW7f/TXK11ggveXVjW5NNTYNXeP9q/jz1UcT6vvkPY=",
-        "owner": "Manoharan-Ajay-Anand",
-        "repo": "cppevent",
-        "rev": "68f530d002247950402b3969a1fe2a45b28dc877",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Manoharan-Ajay-Anand",
-        "repo": "cppevent",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
-      "locked": {
-        "lastModified": 1711615138,
-        "narHash": "sha256-iU+hczWxQVcknGhKpcgz+wTA8/g0XIlPxR+XAIqE96A=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "918363e6fced7ae9e27c6b0c36195c2f9f94adde",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_2": {
       "locked": {
         "lastModified": 1711460390,
         "narHash": "sha256-akSgjDZL6pVHEfSE6sz1DNSXuYX6hq+P/1Z5IoYWs7E=",
@@ -51,8 +18,7 @@
     },
     "root": {
       "inputs": {
-        "cppevent": "cppevent",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs"
       }
     }
   },
