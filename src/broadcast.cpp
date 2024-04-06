@@ -1,5 +1,7 @@
 #include "broadcast.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <cppevent_base/status_awaiter.hpp>
 
 #include <cppevent_fcgi/output.hpp>
@@ -33,6 +35,18 @@ void tradesim::broadcast::unsubscribe(const object_id& id) {
         m_stream_map.erase(it);
     }
 }
+
+tradesim::message::message(const object_id& id, std::string_view type, const json& j) {
+    m_recipient_opt = id;
+    m_type = type;
+    m_content = j.dump();
+}
+
+tradesim::message::message(std::string_view type, const json& j) {
+    m_type = type;
+    m_content = j.dump();
+}
+
 
 void tradesim::broadcast::send_msg(const message& msg) {
     std::string response = std::format("event: {}\ndata: {}\n\n", msg.m_type, msg.m_content);

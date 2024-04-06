@@ -1,7 +1,7 @@
 #ifndef TRADESIM_TYPES_HPP
 #define TRADESIM_TYPES_HPP
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include <cppevent_base/async_queue.hpp>
 

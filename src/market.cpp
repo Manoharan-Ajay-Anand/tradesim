@@ -1,9 +1,15 @@
 #include "market.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <stdexcept>
 #include <iostream>
 
 constexpr std::string_view PRICE_POINT_MSG = "pricePoint";
+
+constexpr std::string_view ACCOUNT_MSG = "account";
+
+constexpr std::string_view TRADE_MSG = "trade";
 
 tradesim::market::market(cppevent::event_loop& el): m_messages(el), m_task(broadcast_messages()) {
     m_order_count = 0;
@@ -20,37 +26,19 @@ cppevent::awaitable_task<void> tradesim::market::broadcast_messages() {
 void tradesim::market::update_bid_count(long price, long diff) {
     auto& price_point = (m_price_points.try_emplace(price, price, 0, 0).first)->second;
     price_point.m_bid_count += diff;
-    json j = price_point;
-    m_messages.push(message { {}, PRICE_POINT_MSG, j.dump() });
+    m_messages.push(message { PRICE_POINT_MSG, json { price_point } });
 }
 
 void tradesim::market::update_ask_count(long price, long diff) {
     auto& price_point = (m_price_points.try_emplace(price, price, 0, 0).first)->second;
     price_point.m_ask_count += diff;
-    json j = price_point;
-    m_messages.push(message { {}, PRICE_POINT_MSG, j.dump() });
+    m_messages.push(message { PRICE_POINT_MSG, json { price_point } });
 }
 
-namespace tradesim {
-
-struct trade {
-    bool m_matched;
-    long m_price;
-    long m_quantity;
-
-    static trade match(const order& bid, const order& ask) {
-        if (bid.m_price < ask.m_price) {
-            return { false, 0, 0 };
-        }
-        long quantity = std::min(bid.m_quantity, ask.m_quantity);
-        long price = bid.m_price;
-        if (ask.m_id < bid.m_id) {
-            price = ask.m_price;
-        }
-        return { true, price, quantity };
-    }
-};
-
+void tradesim::market::update_account(const object_id& trader_id, order_type type, trade t) {
+    auto& account = m_accounts.at(trader_id);
+    account.confirm(type, t.m_price, t.m_quantity);
+    m_messages.push(message { trader_id, ACCOUNT_MSG, json { account } });
 }
 
 void tradesim::market::execute_trades() {
@@ -75,10 +63,10 @@ void tradesim::market::execute_trades() {
             break;
         }
 
-        auto& buyer = m_accounts.at(bid.m_trader);
-        buyer.confirm(order_type::BID, t.m_price, t.m_quantity);
-        auto& seller = m_accounts.at(ask.m_trader);
-        seller.confirm(order_type::ASK, t.m_price, t.m_quantity);
+        m_messages.push(message { TRADE_MSG, json { t } });
+
+        update_account(bid.m_trader, order_type::BID, t);
+        update_account(ask.m_trader, order_type::ASK, t);
 
         update_bid_count(bid.m_price, 0 - t.m_quantity);
         update_ask_count(ask.m_price, 0 - t.m_quantity);

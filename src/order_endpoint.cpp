@@ -3,6 +3,8 @@
 #include "market_types.hpp"
 #include "exchange.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <stdexcept>
 
 constexpr std::string_view INVALID_INPUT_MESSAGE = 

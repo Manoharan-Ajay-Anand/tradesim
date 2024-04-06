@@ -36,6 +36,10 @@ struct message {
     std::optional<object_id> m_recipient_opt;
     std::string_view m_type;
     std::string m_content;
+
+    message(const object_id& id, std::string_view type, const json& j);
+
+    message(std::string_view type, const json& j);
 };
 
 class broadcast {

@@ -60,18 +60,24 @@ struct price_point {
 
 void to_json(json& j, const price_point& pp);
 
-class position {
-private:
+struct position {
     long m_pnl = 0;
     long m_count = 0;
 
-public:
-    long get_pnl() const;
-
-    long get_count() const;
-
     void confirm(order_type type, long price, long quantity);
 };
+
+void to_json(json& j, const position& pos);
+
+struct trade {
+    bool m_matched;
+    long m_price;
+    long m_quantity;
+
+    static trade match(const order& bid, const order& ask);
+};
+
+void to_json(json& j, const trade& t);
 
 }
 

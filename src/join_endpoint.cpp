@@ -3,6 +3,8 @@
 #include "types.hpp"
 #include "exchange.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <string>
 #include <string_view>
 #include <format>

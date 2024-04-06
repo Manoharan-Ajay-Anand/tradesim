@@ -1,5 +1,7 @@
 #include "types.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <algorithm>
 #include <cstring>
 #include <stdexcept>
