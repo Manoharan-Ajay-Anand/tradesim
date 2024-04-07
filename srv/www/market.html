@@ -8,25 +8,17 @@
 <body>
     <div id="statBox"></div>
     <table id="priceBox">
-        <tr>
-            <td class="zero-padding">
-                <table class="full-width">
-                    <tr>
-                        <th class="cell-header">Bids</th>
-                        <th class="cell-header">Price</th>
-                        <th class="cell-header">Asks</th>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td class="zero-padding">
-                <div id="priceScrollDiv">
-                    <table id="priceTable" class="full-width">
-                    </table>
-                </div>
-            </td>
-        </tr>
+        <thead>
+            <tr>
+                <th class="cell-header">Size</th>
+                <th class="cell-header">Bid</th>
+                <th class="cell-header"></th>
+                <th class="cell-header">Ask</th>
+                <th class="cell-header">Size</th>
+            </tr>
+        </thead>
+        <tbody id="priceTable">
+        </tbody>
     </table>
     <div id="orderBox"></div>
     <script src="js/market.js"></script>

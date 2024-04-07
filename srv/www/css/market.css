@@ -3,21 +3,12 @@
     margin: auto;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-#priceScrollDiv::-webkit-scrollbar {
-    display: none;
-}
-
-#priceScrollDiv {
-    height: 400px;
-    overflow: auto;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    border: 1px solid darkgray;
-}
-
 table {
     border-collapse: collapse;
+}
+
+.right-border {
+    border-right-color: darkgray;
 }
 
 .cell {

@@ -14,13 +14,13 @@ constexpr std::string_view TRADE_MSG = "trade";
 void tradesim::market::update_bid_count(long price, long diff) {
     auto& price_point = (m_price_points.try_emplace(price, price, 0, 0).first)->second;
     price_point.m_bid_count += diff;
-    m_broadcast.send_msg(message { PRICE_POINT_MSG, json { price_point } });
+    m_broadcast.send_msg(message { PRICE_POINT_MSG, price_point });
 }
 
 void tradesim::market::update_ask_count(long price, long diff) {
     auto& price_point = (m_price_points.try_emplace(price, price, 0, 0).first)->second;
     price_point.m_ask_count += diff;
-    m_broadcast.send_msg(message { PRICE_POINT_MSG, json { price_point } });
+    m_broadcast.send_msg(message { PRICE_POINT_MSG, price_point });
 }
 
 void tradesim::market::update_accounts(const object_id& buyer_id, const object_id& seller_id, trade t) {
@@ -30,8 +30,8 @@ void tradesim::market::update_accounts(const object_id& buyer_id, const object_i
     auto& seller = m_accounts.at(seller_id);
     seller.confirm(order_type::ASK, t.m_price, t.m_quantity);
     
-    m_broadcast.send_msg(message { buyer_id, ACCOUNT_MSG, json { buyer } });
-    m_broadcast.send_msg(message { seller_id, ACCOUNT_MSG, json { seller } });
+    m_broadcast.send_msg(message { buyer_id, ACCOUNT_MSG, buyer });
+    m_broadcast.send_msg(message { seller_id, ACCOUNT_MSG, seller });
 }
 
 void tradesim::market::execute_trades() {
@@ -56,7 +56,7 @@ void tradesim::market::execute_trades() {
             break;
         }
 
-        m_broadcast.send_msg(message { TRADE_MSG, json { t } });
+        m_broadcast.send_msg(message { TRADE_MSG, t });
 
         update_accounts(bid.m_trader, ask.m_trader, t);
 
