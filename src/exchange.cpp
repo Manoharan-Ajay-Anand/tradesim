@@ -1,10 +1,7 @@
 #include "exchange.hpp"
 
-tradesim::exchange::exchange(cppevent::event_loop& loop): m_loop(loop) {
-}
-
 bool tradesim::exchange::create_market(const object_id& market_id) {
-    return m_markets.try_emplace(market_id, std::ref(m_loop)).second;
+    return m_markets.try_emplace(market_id).second;
 }
 
 bool tradesim::exchange::join_market(const object_id& market_id, const object_id& trader_id) {

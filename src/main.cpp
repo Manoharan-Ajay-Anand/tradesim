@@ -15,7 +15,7 @@
 int main() {
     cppevent::event_loop loop;
 
-    tradesim::exchange ex { loop };
+    tradesim::exchange ex;
 
     tradesim::welcome_endpoint welcome;
     tradesim::create_endpoint create { ex };

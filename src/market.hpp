@@ -38,6 +38,8 @@ private:
 
     void execute_trades();
 public:
+    market() = default;
+
     market(const market&) = delete;
     market& operator=(const market&) = delete;
 
