@@ -26,15 +26,10 @@ private:
 
     std::unordered_map<long, price_point> m_price_points;
 
-    long m_order_count;
+    long m_order_count = 0;
     std::unordered_map<long, order> m_orders;
     bid_queue m_bids;
     ask_queue m_asks;
-
-    cppevent::async_queue<message> m_messages;
-    cppevent::awaitable_task<void> m_task;
-
-    cppevent::awaitable_task<void> broadcast_messages();
 
     void update_bid_count(long price, long diff);
     void update_ask_count(long price, long diff);
@@ -43,8 +38,6 @@ private:
 
     void execute_trades();
 public:
-    market(cppevent::event_loop& el);
-
     market(const market&) = delete;
     market& operator=(const market&) = delete;
 
