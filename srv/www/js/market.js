@@ -23,7 +23,7 @@ for (let i = 1; i <= 17; ++i) {
     askSize.textContent = "0";
     
     row.append(bidSize, bid, document.createElement("td"), ask, askSize);
-    priceTable.prepend(row);
+    priceTable.append(row);
 
     bidRows.push({ priceElem: bid, sizeElem: bidSize});
     askRows.push({ priceElem: ask, sizeElem: askSize});
@@ -93,6 +93,23 @@ function update(arr, map, price, size, compareFn) {
     }
 }
 
+function updateRows(rows, map, arr) {
+    for (let i = 0; i < rows.length; ++i) {
+        let priceElem = rows[i].priceElem;
+        let sizeElem = rows[i].sizeElem;
+
+        if (i >= arr.length) {
+            priceElem.classList.add("invisible");
+            sizeElem.classList.add("invisible");    
+        } else {
+            priceElem.textContent = arr[i].toString();
+            sizeElem.textContent = map.get(arr[i]).toString();
+            priceElem.classList.remove("invisible");
+            sizeElem.classList.remove("invisible");
+        }
+    }
+}
+
 const orderedBids = [];
 const orderedAsks = [];
 
@@ -103,8 +120,8 @@ evtSource.addEventListener("pricePoint", (event) => {
     update(orderedBids, bids, pp.price, pp.bids, (a, b) => b - a);
     update(orderedAsks, asks, pp.price, pp.asks, (a, b) => a - b);
 
-    console.log(orderedBids);
-    console.log(orderedAsks);
+    updateRows(bidRows, bids, orderedBids);
+    updateRows(askRows, asks, orderedAsks);
 });
 
 evtSource.addEventListener("duplicate", () => {
