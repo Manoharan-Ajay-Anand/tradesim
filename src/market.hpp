@@ -34,7 +34,7 @@ private:
     void update_bid_count(long price, long diff);
     void update_ask_count(long price, long diff);
 
-    void update_account(const object_id& trader_id, order_type type, trade t);
+    void update_accounts(const object_id& buyer_id, const object_id& seller_id, trade t);
 
     void execute_trades();
 public:

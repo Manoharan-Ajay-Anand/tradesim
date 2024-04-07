@@ -24,11 +24,11 @@ int main() {
     tradesim::order_endpoint order { ex };
 
     cppevent::router routes;
-    routes.get("/api", welcome);
-    routes.post("/api/create", create);
-    routes.post("/api/join", join);
-    routes.get("/api/stream/{marketId}/{traderId}", stream);
-    routes.post("/api/order", order);
+    routes.get("/api/tradesim", welcome);
+    routes.post("/api/tradesim/create", create);
+    routes.post("/api/tradesim/join", join);
+    routes.get("/api/tradesim/stream/{marketId}/{traderId}", stream);
+    routes.post("/api/tradesim/order", order);
 
     cppevent::fcgi_server tradesim_server("/tmp/tradesim.sock", loop, routes);
 

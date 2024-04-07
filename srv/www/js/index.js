@@ -9,7 +9,7 @@ const marketInput = document.getElementById("marketInput");
 async function onClickCreate(elem, event) {
     const marketId = marketInput.value;
     
-    const request = new Request("/api/create", { method: "POST", body: marketId });
+    const request = new Request("/api/tradesim/create", { method: "POST", body: marketId });
     const response = await fetch(request);
     const message = await response.text(); 
     if (!response.ok) {
@@ -37,7 +37,7 @@ function onClickJoin() {
 async function joinMarket(marketId) {
     const traderId = getRandomString(30);
     const form = { marketId: marketId, traderId: traderId };
-    const request = new Request("/api/join", { method: "POST", body: JSON.stringify(form) });
+    const request = new Request("/api/tradesim/join", { method: "POST", body: JSON.stringify(form) });
     const response = await fetch(request);
     const message = await response.text(); 
     if (!response.ok) {
