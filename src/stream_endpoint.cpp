@@ -40,7 +40,7 @@ cppevent::awaitable_task<void> tradesim::stream_endpoint::process(const cppevent
     market_id = market_id_str;
     trader_id = trader_id_str;
 
-    co_await o_stdout.write("status: 200\ncontent-type: text/event-stream\n\n");
+    co_await o_stdout.write("status: 200\ncontent-type: text/event-stream\nx-accel-buffering: no\n\n");
 
     market_stream stream { m_loop };
 
