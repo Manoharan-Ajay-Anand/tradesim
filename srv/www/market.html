@@ -6,21 +6,57 @@
     <link rel="stylesheet" href="css/common.css">
 </head>
 <body>
-    <div id="statBox"></div>
-    <table id="priceBox">
-        <thead>
-            <tr>
-                <th class="cell-header">Size</th>
-                <th class="cell-header">Bid</th>
-                <th class="cell-header"></th>
-                <th class="cell-header">Ask</th>
-                <th class="cell-header">Size</th>
-            </tr>
-        </thead>
-        <tbody id="priceTable">
-        </tbody>
-    </table>
-    <div id="orderBox"></div>
+    <div id="mainBox">
+        <div id="statBox" class="responsive">
+            <div class="card">
+                <span class="stat-header">Position</span>
+                <br>
+                <span id="positionValue" class="stat-value">0</span>
+            </div>
+            <div class="card">
+                <span class="stat-header">P&L</span>
+                <br>
+                <span id="pnlValue" class="stat-value">0</span>
+            </div>
+            <div class="card">
+                <span class="stat-header">Price</span>
+                <br>
+                <span  id="priceValue" class="stat-value">0</span>
+            </div>
+        </div>
+        <table class="responsive">
+            <thead>
+                <tr>
+                    <th class="cell-header">Size</th>
+                    <th class="cell-header">Bid</th>
+                    <th id="priceTableDivider"></th>
+                    <th class="cell-header">Ask</th>
+                    <th class="cell-header">Size</th>
+                </tr>
+            </thead>
+            <tbody id="priceTable">
+            </tbody>
+        </table>
+        <div id="orderBox" class="responsive">
+            <div>
+                <label for="priceInput">Price:</label>
+                <input id="priceInput" type="number">
+            </div>
+            <div>
+                <label for="quantityInput">Quantity:</label>
+                <input id="quantityInput" type="number">
+            </div>
+            <div class="radio-group">
+                <input type="radio" id="bidInput" name="orderType" value="bid" checked>
+                <label for="bidInput">Bid</label>
+            </div>
+            <div class="radio-group">
+                <input type="radio" id="askInput" name="orderType" value="ask">
+                <label for="askInput">Ask</label>
+            </div>
+            <button id="submitButton" type="button" class="rounded-border-3">Submit</button>
+        </div>
+    </div>
     <script src="js/market.js"></script>
 </body>
 </html>

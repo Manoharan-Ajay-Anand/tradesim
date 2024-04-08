@@ -1,21 +1,21 @@
-#priceBox {
-    width: 30%;
-    margin: auto;
+.responsive {
+    width: 90%;
+    max-width: 50rem;
 }
 
 table {
     border-collapse: collapse;
 }
 
-.right-border {
-    border-right-color: darkgray;
+#priceTableDivider {
+    width: 5rem;
 }
 
 .cell {
     text-align: center;
     border: 1px solid lightgrey;
     max-width: 0;
-    height: 20px;
+    height: 1.5rem;
 }
 
 .cell-header {
@@ -27,4 +27,45 @@ table {
 .invisible {
     color: transparent;
     user-select: none;
+}
+
+#statBox {
+    display: flex;
+    justify-content: space-around;
+    margin: 1.5rem 0;
+}
+
+.card {
+    text-align: center;
+    border: 1px solid lightgray;
+    border-radius: 1rem;
+    width: 20%;
+}
+
+.stat-header {
+    font-size: small;
+}
+
+.stat-value {
+    font-size: x-large;
+}
+
+#orderBox {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 3rem;
+    margin-top: 2rem;
+}
+
+.radio-group {
+    display: flex;
+    height: 100%;
+    align-items: center;
+}
+
+#submitButton {
+    background-color: blue;
+    border-color: blue;
+    color: white;
 }

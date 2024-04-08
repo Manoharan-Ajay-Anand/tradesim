@@ -3,7 +3,7 @@ const priceTable = document.getElementById("priceTable");
 const bidRows = [];
 const askRows = [];
 
-for (let i = 1; i <= 17; ++i) {
+for (let i = 1; i <= 13; ++i) {
     const row = document.createElement("tr");
 
     const bidSize = document.createElement("td");
@@ -115,7 +115,6 @@ const orderedAsks = [];
 
 evtSource.addEventListener("pricePoint", (event) => {
     const pp = JSON.parse(event.data);
-    console.log(pp);
     
     update(orderedBids, bids, pp.price, pp.bids, (a, b) => b - a);
     update(orderedAsks, asks, pp.price, pp.asks, (a, b) => a - b);
@@ -124,7 +123,43 @@ evtSource.addEventListener("pricePoint", (event) => {
     updateRows(askRows, asks, orderedAsks);
 });
 
+const positionValueElem = document.getElementById("positionValue");
+const pnlValueElem = document.getElementById("pnlValue");
+
+evtSource.addEventListener("account", (event) => {
+    const account = JSON.parse(event.data);
+    positionValueElem.textContent = account.count.toString();
+    pnlValueElem.textContent = account.pnl.toString();
+});
+
+const priceValueElem = document.getElementById("priceValue");
+
+evtSource.addEventListener("trade", (event) => {
+    const trade = JSON.parse(event.data);
+    priceValueElem.textContent = trade.price.toString();
+});
+
 evtSource.addEventListener("duplicate", () => {
     alert("Only one stream allowed per trader");
     evtSource.close();
 });
+
+const submitButton = document.getElementById("submitButton");
+submitButton.addEventListener("click", onClickSubmit);
+
+const priceInput = document.getElementById("priceInput");
+const quantityInput = document.getElementById("quantityInput");
+
+async function onClickSubmit(elem, event) {
+    const price = parseInt(priceInput.value);
+    const quantity = parseInt(quantityInput.value);
+    const type = document.querySelector('input[name="orderType"]:checked').value;
+
+    const form = { price, quantity, type, marketId, traderId }
+    const request = new Request("/api/tradesim/order", { method: "POST", body: JSON.stringify(form) });
+    const response = await fetch(request);
+
+    if (!response.ok) {
+        alert(await response.text());
+    }
+} 

@@ -1,9 +1,3 @@
-#mainBox {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
 #inputBox {
     padding: 30px;
 }
