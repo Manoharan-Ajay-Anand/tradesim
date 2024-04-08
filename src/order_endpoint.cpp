@@ -10,6 +10,8 @@
 constexpr std::string_view INVALID_INPUT_MESSAGE = 
         "status: 400\ncontent-length: 13\ncontent-type: text/plain\n\nInvalid Input";
 
+constexpr std::string_view INVALID_PRICE_QUANTITY_MESSAGE = 
+        "status: 400\ncontent-length: 25\ncontent-type: text/plain\n\nInvalid price or quantity";
 
 constexpr std::string_view MARKET_ID_NOT_FOUND_MESSAGE = 
         "status: 404\ncontent-length: 19\ncontent-type: text/plain\n\nMarket ID not found";
@@ -38,6 +40,11 @@ cppevent::awaitable_task<void> tradesim::order_endpoint::process(const cppevent:
     }
     if (invalid_input) {
         co_await o_stdout.write(INVALID_INPUT_MESSAGE);
+        co_return;
+    }
+
+    if (form.m_price <= 0 || form.m_quantity <= 0) {
+        co_await o_stdout.write(INVALID_PRICE_QUANTITY_MESSAGE);
         co_return;
     }
 
