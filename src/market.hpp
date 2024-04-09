@@ -5,19 +5,18 @@
 #include "market_types.hpp"
 #include "broadcast.hpp"
 
-#include <cppevent_base/task.hpp>
-#include <cppevent_base/async_queue.hpp>
-
 #include <unordered_map>
 #include <memory>
 
-namespace cppevent {
-
-class event_loop;
-
-}
-
 namespace tradesim {
+
+using order_map = std::unordered_map<long, order>;
+
+struct bid_ask_pair {
+    bool m_valid;
+    order_map::iterator m_bid_it;
+    order_map::iterator m_ask_it;
+};
 
 class market {
 private:
@@ -26,16 +25,21 @@ private:
 
     std::unordered_map<long, price_point> m_price_points;
 
+    trade m_last_trade;
+
     long m_order_count = 0;
-    std::unordered_map<long, order> m_orders;
+    order_map m_orders;
     bid_queue m_bids;
     ask_queue m_asks;
+
+    void update_bid_ask_count(long price, long bid_diff, long ask_diff);
 
     void update_bid_count(long price, long diff);
     void update_ask_count(long price, long diff);
 
     void update_accounts(const object_id& buyer_id, const object_id& seller_id, trade t);
 
+    bid_ask_pair get_next_bid_ask_pair();
     void execute_trades();
 public:
     market() = default;
