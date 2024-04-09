@@ -52,10 +52,6 @@ cppevent::awaitable_task<void> tradesim::stream_endpoint::process(const cppevent
 
     while (true) {
         long count = co_await stream.await_items();
-        if (count == 0) {
-            continue;
-        }
-        
         std::string msg;
         for (long i = 0; i < count; ++i) {
             msg.append(stream.front());
