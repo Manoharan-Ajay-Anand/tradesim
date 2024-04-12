@@ -45,3 +45,10 @@ tradesim::trade tradesim::trade::match(const order& bid, const order& ask) {
 void tradesim::to_json(json& j, const trade& t) {
     j = json { { "price", t.m_price }, { "quantity", t.m_quantity } };
 }
+
+void tradesim::to_json(json& j, const order_update& o) {
+    j = json { 
+        { "orderId", o.m_order_id }, { "price", o.m_price },
+        { "quantity", o.m_quantity}, { "remaining", o.m_remaining }
+    };
+}
