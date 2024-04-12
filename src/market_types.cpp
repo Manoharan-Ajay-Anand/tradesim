@@ -2,17 +2,32 @@
 
 #include <nlohmann/json.hpp>
 
-void tradesim::from_json(const json& j, order_form& o) {
-    j.at("marketId").get_to(o.m_market_id);
-    j.at("traderId").get_to(o.m_trader_id);
-    auto& type = j.at("type").get_ref<const std::string&>();
-    if (type == "bid") {
-        o.m_type = order_type::BID;
-    } else if (type == "ask") {
-        o.m_type = order_type::ASK;
+void tradesim::from_json(const json& j, order_type& type) {
+    const std::string& type_str = j.get_ref<const std::string&>();
+    if (type_str == "bid") {
+        type = order_type::BID;
+    } else if (type_str == "ask") {
+        type = order_type::ASK;
     } else {
         throw std::runtime_error("Invalid type of order");
     }
+}
+
+void tradesim::to_json(json& j, const order_type& type) {
+    switch (type) {
+        case order_type::BID:
+            j = std::string { "bid" };
+            break;
+        case order_type::ASK:
+            j = std::string { "ask" };
+            break;
+    }
+}
+
+void tradesim::from_json(const json& j, order_form& o) {
+    j.at("marketId").get_to(o.m_market_id);
+    j.at("traderId").get_to(o.m_trader_id);
+    j.at("type").get_to(o.m_type);
     j.at("price").get_to(o.m_price);
     j.at("quantity").get_to(o.m_quantity);
 }
@@ -48,7 +63,8 @@ void tradesim::to_json(json& j, const trade& t) {
 
 void tradesim::to_json(json& j, const order_update& o) {
     j = json { 
-        { "orderId", o.m_order_id }, { "price", o.m_price },
+        { "orderId", o.m_order_id }, { "orderType", o.m_order_type },
+        { "price", o.m_price },
         { "quantity", o.m_quantity}, { "remaining", o.m_remaining }
     };
 }
