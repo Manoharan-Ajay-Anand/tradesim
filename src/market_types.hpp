@@ -85,7 +85,7 @@ void to_json(json& j, const trade& t);
 
 struct order_update {
     long m_order_id;
-    long m_order_type;
+    order_type m_order_type;
     long m_price;
     long m_quantity;
     long m_remaining;

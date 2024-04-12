@@ -11,6 +11,12 @@ constexpr std::string_view ACCOUNT_MSG = "account";
 
 constexpr std::string_view TRADE_MSG = "trade";
 
+constexpr std::string_view ORDER_SUBMITTED = "orderSubmitted";
+
+constexpr std::string_view ORDER_EXECUTED = "orderExecuted";
+
+constexpr std::string_view ORDER_CANCELLED = "orderCancelled";
+
 void tradesim::market::update_bid_ask_count(long price, long bid_diff, long ask_diff) {
     auto it = m_price_points.try_emplace(price, price, 0, 0).first;
     
@@ -88,12 +94,16 @@ void tradesim::market::execute_trades() {
         update_ask_count(ask.m_price, quantity_diff);
 
         bid.m_quantity -= t.m_quantity;
+        order_update bid_ou = { bid.m_id, bid.m_type, t.m_price, t.m_quantity, bid.m_quantity };
+        m_broadcast.send_msg(message { bid.m_trader, ORDER_EXECUTED, bid_ou });
         if (bid.m_quantity == 0) {
             m_orders.erase(bid_it);
             m_bids.pop();
         }
 
         ask.m_quantity -= t.m_quantity;
+        order_update ask_ou = { ask.m_id, ask.m_type, t.m_price, t.m_quantity, ask.m_quantity };
+        m_broadcast.send_msg(message { ask.m_trader, ORDER_EXECUTED, ask_ou });
         if (ask.m_quantity == 0) {
             m_orders.erase(ask_it);
             m_asks.pop();
@@ -136,7 +146,11 @@ void tradesim::market::place_bid(const object_id& trader_id, long price, long qu
     order o = { ++m_order_count, trader_id, order_type::BID, price, quantity };
     m_orders[o.m_id] = o;
     m_bids.push({o.m_id, o.m_price});
+
+    order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
+    m_broadcast.send_msg(message { trader_id, ORDER_SUBMITTED, ou });
     update_bid_count(price, quantity);
+    
     execute_trades();
 }
 
@@ -148,6 +162,10 @@ void tradesim::market::place_ask(const object_id& trader_id, long price, long qu
     order o = { ++m_order_count, trader_id, order_type::ASK, price, quantity };
     m_orders[o.m_id] = o;
     m_asks.push({o.m_id, o.m_price});
+
+    order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
+    m_broadcast.send_msg(message { trader_id, ORDER_SUBMITTED, ou });
     update_ask_count(price, quantity);
+
     execute_trades();
 }
