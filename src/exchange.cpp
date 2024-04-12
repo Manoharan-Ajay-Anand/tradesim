@@ -39,3 +39,13 @@ bool tradesim::exchange::place_order(const order_form& form) {
     }
     return true;
 }
+
+bool tradesim::exchange::cancel_order(const object_id& market_id,
+                                      const object_id& trader_id, long order_id) {
+    auto it = m_markets.find(market_id);
+    if (it == m_markets.end()) {
+        return false;
+    }
+
+    return (it->second).cancel_order(trader_id, order_id);
+}

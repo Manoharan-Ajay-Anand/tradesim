@@ -57,6 +57,8 @@ public:
 
     void place_bid(const object_id& trader_id, long price, long quantity);
     void place_ask(const object_id& trader_id, long price, long quantity);
+
+    bool cancel_order(const object_id& trader_id, long order_id);
 };
 
 }

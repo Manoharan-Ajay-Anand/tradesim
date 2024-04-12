@@ -1,4 +1,6 @@
 add_executable(tradesim 
+    broadcast.cpp
+    cancel_endpoint.cpp
     create_endpoint.cpp
     exchange.cpp
     join_endpoint.cpp
@@ -7,7 +9,6 @@ add_executable(tradesim
     market.cpp
     order_endpoint.cpp
     stream_endpoint.cpp
-    broadcast.cpp
     types.cpp
     welcome_endpoint.cpp
 )

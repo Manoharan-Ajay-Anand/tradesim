@@ -148,8 +148,8 @@ void tradesim::market::place_bid(const object_id& trader_id, long price, long qu
     m_bids.push({o.m_id, o.m_price});
 
     order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
-    m_broadcast.send_msg(message { trader_id, ORDER_SUBMITTED, ou });
     update_bid_count(price, quantity);
+    m_broadcast.send_msg(message { trader_id, ORDER_SUBMITTED, ou });
     
     execute_trades();
 }
@@ -164,8 +164,35 @@ void tradesim::market::place_ask(const object_id& trader_id, long price, long qu
     m_asks.push({o.m_id, o.m_price});
 
     order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
-    m_broadcast.send_msg(message { trader_id, ORDER_SUBMITTED, ou });
     update_ask_count(price, quantity);
+    m_broadcast.send_msg(message { trader_id, ORDER_SUBMITTED, ou });
 
     execute_trades();
+}
+
+bool tradesim::market::cancel_order(const object_id& trader_id, long order_id) {
+    auto it = m_orders.find(order_id);
+    if (it == m_orders.end()) {
+        return false;
+    }
+
+    order& o = it->second;
+    if (o.m_trader != trader_id) {
+        return false;
+    }
+    
+    order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
+    long diff = 0 - o.m_quantity;
+    switch (o.m_type) {
+        case order_type::BID:
+            update_bid_count(o.m_price, diff);
+            break;
+        case order_type::ASK:
+            update_ask_count(o.m_price, diff);
+            break;
+    }
+    m_orders.erase(it);
+
+    m_broadcast.send_msg(message { trader_id, ORDER_CANCELLED, ou });
+    return true;
 }

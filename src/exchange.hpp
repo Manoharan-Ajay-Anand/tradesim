@@ -23,6 +23,8 @@ public:
                                             market_stream* m_ptr);
     
     bool place_order(const order_form& form);
+
+    bool cancel_order(const object_id& market_id, const object_id& trader_id, long order_id);
 };
 
 }
