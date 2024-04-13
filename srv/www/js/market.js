@@ -170,6 +170,10 @@ async function cancelOrder(orderId) {
 
 evtSource.addEventListener("orderSubmitted", (event) => {
     const update = JSON.parse(event.data);
+
+    if (orderPillMap.has(update.orderId)) {
+        return;
+    }
     
     const orderPill = document.createElement("div");
     orderPill.classList.add("order-pill");
