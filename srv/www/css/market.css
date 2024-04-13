@@ -51,16 +51,19 @@ table {
 }
 
 #pendingOrderBox {
-    display: flex;
-    align-items: center;
-    height: 3rem;
+    height: 4rem;
+    border: 1px solid lightgray;
+    padding: 0.5rem;
+    overflow: auto;
+    margin-bottom: 1rem;
 }
 
 .order-pill {
+    display: inline-block;
     padding: 0.5rem;
     border: 1px solid lightgray;
     border-radius: 0.5rem;
-    margin-right: 1rem;
+    margin: 0.5rem;
 }
 
 .order-cancel {
