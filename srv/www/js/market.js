@@ -144,6 +144,72 @@ evtSource.addEventListener("duplicate", () => {
     evtSource.close();
 });
 
+const orderPillMap = new Map();
+
+const pendingOrderBox = document.getElementById("pendingOrderBox");
+
+function getOrderPillText(update) {
+    let t = "Bid: ";
+    if (update.orderType === "ask") {
+        t = "Ask: ";
+    }
+    t += `${update.remaining} @ ${update.price}`;
+    return t;
+}
+
+async function cancelOrder(orderId) {
+    const form = { marketId, traderId, orderId }
+    const request = new Request("/api/tradesim/cancel", { method: "POST", body: JSON.stringify(form) });
+
+    const response = await fetch(request);
+
+    if (!response.ok) {
+        alert(await response.text());
+    }
+}
+
+evtSource.addEventListener("orderSubmitted", (event) => {
+    const update = JSON.parse(event.data);
+    
+    const orderPill = document.createElement("div");
+    orderPill.classList.add("order-pill");
+    
+    const orderText = document.createElement("span");
+    orderText.textContent = getOrderPillText(update);
+
+    const orderCancel = document.createElement("div");
+    orderCancel.innerHTML = "&#x00d7;";
+    orderCancel.classList.add("order-cancel");
+    orderCancel.addEventListener("click", () => cancelOrder(update.orderId));
+
+    orderPill.append(orderText, orderCancel);
+    pendingOrderBox.append(orderPill);
+
+    orderPillMap.set(update.orderId, { pill: orderPill, span: orderText });
+});
+
+evtSource.addEventListener("orderExecuted", (event) => {
+    const update = JSON.parse(event.data);
+
+    if (orderPillMap.has(update.orderId)) {
+        const orderElement = orderPillMap.get(update.orderId);
+        orderElement.span.textContent = getOrderPillText(update);
+        if (update.remaining === 0) {
+            pendingOrderBox.removeChild(orderElement.pill);
+            orderPillMap.delete(update.orderId);
+        }
+    }
+});
+
+evtSource.addEventListener("orderCancelled", (event) => {
+    const update = JSON.parse(event.data);
+
+    if (orderPillMap.has(update.orderId)) {
+        pendingOrderBox.removeChild(orderPillMap.get(update.orderId).pill);
+        orderPillMap.delete(update.orderId);
+    }
+});
+
 const submitButton = document.getElementById("submitButton");
 submitButton.addEventListener("click", onClickSubmit);
 
