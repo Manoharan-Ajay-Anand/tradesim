@@ -97,6 +97,7 @@ void tradesim::market::execute_trades() {
         order_update bid_ou = { bid.m_id, bid.m_type, t.m_price, t.m_quantity, bid.m_quantity };
         m_broadcast.send_msg(message { bid.m_trader, ORDER_EXECUTED, bid_ou });
         if (bid.m_quantity == 0) {
+            m_trader_orders[bid.m_trader].erase(bid.m_id);
             m_orders.erase(bid_it);
             m_bids.pop();
         }
@@ -105,6 +106,7 @@ void tradesim::market::execute_trades() {
         order_update ask_ou = { ask.m_id, ask.m_type, t.m_price, t.m_quantity, ask.m_quantity };
         m_broadcast.send_msg(message { ask.m_trader, ORDER_EXECUTED, ask_ou });
         if (ask.m_quantity == 0) {
+            m_trader_orders[ask.m_trader].erase(ask.m_id);
             m_orders.erase(ask_it);
             m_asks.pop();
         }
@@ -130,6 +132,12 @@ std::unique_ptr<tradesim::subscription> tradesim::market::subscribe(const object
         for (auto& pp : m_price_points) {
             m_broadcast.send_msg(message { trader_id, PRICE_POINT_MSG, pp.second });
         }
+
+        for (long order_id : m_trader_orders[trader_id]) {
+            order& o = m_orders.at(order_id);
+            order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
+            m_broadcast.send_msg(message { trader_id, ORDER_SUBMITTED, ou });
+        }
     }
     return sub_ptr;
 }
@@ -146,6 +154,7 @@ void tradesim::market::place_bid(const object_id& trader_id, long price, long qu
     order o = { ++m_order_count, trader_id, order_type::BID, price, quantity };
     m_orders[o.m_id] = o;
     m_bids.push({o.m_id, o.m_price});
+    m_trader_orders[trader_id].insert(o.m_id);
 
     order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
     update_bid_count(price, quantity);
@@ -162,6 +171,7 @@ void tradesim::market::place_ask(const object_id& trader_id, long price, long qu
     order o = { ++m_order_count, trader_id, order_type::ASK, price, quantity };
     m_orders[o.m_id] = o;
     m_asks.push({o.m_id, o.m_price});
+    m_trader_orders[trader_id].insert(o.m_id);
 
     order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
     update_ask_count(price, quantity);
@@ -191,6 +201,7 @@ bool tradesim::market::cancel_order(const object_id& trader_id, long order_id) {
             update_ask_count(o.m_price, diff);
             break;
     }
+    m_trader_orders[trader_id].erase(o.m_id);
     m_orders.erase(it);
 
     m_broadcast.send_msg(message { trader_id, ORDER_CANCELLED, ou });

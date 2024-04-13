@@ -6,6 +6,7 @@
 #include "broadcast.hpp"
 
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 
 namespace tradesim {
@@ -27,6 +28,7 @@ private:
 
     trade m_last_trade;
 
+    std::unordered_map<object_id, std::unordered_set<long>> m_trader_orders;
     long m_order_count = 0;
     order_map m_orders;
     bid_queue m_bids;
