@@ -52,41 +52,21 @@ void tradesim::market::update_accounts(const object_id& buyer_id, const object_i
     m_broadcast.send_msg(message { seller_id, ACCOUNT_MSG, seller });
 }
 
-tradesim::bid_ask_pair tradesim::market::get_next_bid_ask_pair() {
-    auto bid_it = m_orders.end();
-    while (!m_bids.empty()) {
-        bid_it = m_orders.find(m_bids.top().m_id);
-        if (bid_it != m_orders.end()) {
-            break;
-        }
-        m_bids.pop();
-    }
-
-    auto ask_it = m_orders.end();
-    while (!m_asks.empty()) {
-        ask_it = m_orders.find(m_asks.top().m_id);
-        if (ask_it != m_orders.end()) {
-            break;
-        }
-        m_asks.pop();
-    }
-
-    return { bid_it != m_orders.end() && ask_it != m_orders.end(), bid_it, ask_it };
-}
-
 void tradesim::market::execute_trades() {
-    for (bid_ask_pair p = get_next_bid_ask_pair(); p.m_valid; p = get_next_bid_ask_pair()) {
-        auto bid_it = p.m_bid_it;
-        auto ask_it = p.m_ask_it;
-        
-        auto& bid = bid_it->second;
-        auto& ask = ask_it->second;
+    auto bid_it = m_bids.begin();
+    auto ask_it = m_asks.begin();
+    while (bid_it != m_bids.end() && ask_it != m_asks.end()) {
+        if (bid_it->first < ask_it->first) {
+            break;
+        }
+
+        auto& bid_set = bid_it->second;
+        auto& ask_set = ask_it->second;
+
+        auto& bid = m_orders.at(*(bid_set.begin()));
+        auto& ask = m_orders.at(*(ask_set.begin()));
 
         trade t = trade::match(bid, ask);
-        if (!t.m_matched) {
-            break;
-        }
-
         update_accounts(bid.m_trader, ask.m_trader, t);
 
         long quantity_diff = 0 - t.m_quantity;
@@ -98,8 +78,8 @@ void tradesim::market::execute_trades() {
         m_broadcast.send_msg(message { bid.m_trader, ORDER_EXECUTED, bid_ou });
         if (bid.m_quantity == 0) {
             m_trader_orders[bid.m_trader].erase(bid.m_id);
-            m_orders.erase(bid_it);
-            m_bids.pop();
+            bid_set.erase(bid.m_id);
+            m_orders.erase(bid.m_id);
         }
 
         ask.m_quantity -= t.m_quantity;
@@ -107,8 +87,15 @@ void tradesim::market::execute_trades() {
         m_broadcast.send_msg(message { ask.m_trader, ORDER_EXECUTED, ask_ou });
         if (ask.m_quantity == 0) {
             m_trader_orders[ask.m_trader].erase(ask.m_id);
-            m_orders.erase(ask_it);
-            m_asks.pop();
+            ask_set.erase(ask.m_id);
+            m_orders.erase(ask.m_id);
+        }
+
+        if (bid_set.empty()) {
+            bid_it = m_bids.erase(bid_it);
+        }
+        if (ask_set.empty()) {
+            ask_it = m_asks.erase(ask_it);
         }
     }
 }
@@ -153,7 +140,7 @@ void tradesim::market::place_bid(const object_id& trader_id, long price, long qu
     }
     order o = { ++m_order_count, trader_id, order_type::BID, price, quantity };
     m_orders[o.m_id] = o;
-    m_bids.push({o.m_id, o.m_price});
+    m_bids[o.m_price].insert(o.m_id);
     m_trader_orders[trader_id].insert(o.m_id);
 
     order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
@@ -170,7 +157,7 @@ void tradesim::market::place_ask(const object_id& trader_id, long price, long qu
     }
     order o = { ++m_order_count, trader_id, order_type::ASK, price, quantity };
     m_orders[o.m_id] = o;
-    m_asks.push({o.m_id, o.m_price});
+    m_asks[o.m_price].insert(o.m_id);
     m_trader_orders[trader_id].insert(o.m_id);
 
     order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
@@ -194,12 +181,24 @@ bool tradesim::market::cancel_order(const object_id& trader_id, long order_id) {
     order_update ou = { o.m_id, o.m_type, o.m_price, o.m_quantity, o.m_quantity };
     long diff = 0 - o.m_quantity;
     switch (o.m_type) {
-        case order_type::BID:
+        case order_type::BID: {
             update_bid_count(o.m_price, diff);
+            auto& bid_set = m_bids.at(o.m_price);
+            bid_set.erase(o.m_id);
+            if (bid_set.empty()) {
+                m_bids.erase(o.m_price);
+            }
             break;
-        case order_type::ASK:
+        }
+        case order_type::ASK: {
             update_ask_count(o.m_price, diff);
+            auto& ask_set = m_asks.at(o.m_price);
+            ask_set.erase(o.m_id);
+            if (ask_set.empty()) {
+                m_asks.erase(o.m_price);
+            }
             break;
+        }
     }
     m_trader_orders[trader_id].erase(o.m_id);
     m_orders.erase(it);

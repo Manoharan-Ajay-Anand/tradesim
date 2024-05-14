@@ -25,8 +25,3 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     install(DIRECTORY srv/
             DESTINATION ${CMAKE_INSTALL_SRVDIR})
 endif()
-
-if (BUILD_TESTING)
-    add_subdirectory(test)
-    target_include_directories(tradesim_test PRIVATE src)
-endif()

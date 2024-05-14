@@ -7,17 +7,13 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <map>
+#include <set>
 #include <memory>
 
 namespace tradesim {
 
 using order_map = std::unordered_map<long, order>;
-
-struct bid_ask_pair {
-    bool m_valid;
-    order_map::iterator m_bid_it;
-    order_map::iterator m_ask_it;
-};
 
 class market {
 private:
@@ -29,10 +25,12 @@ private:
     trade m_last_trade;
 
     std::unordered_map<object_id, std::unordered_set<long>> m_trader_orders;
+
     long m_order_count = 0;
     order_map m_orders;
-    bid_queue m_bids;
-    ask_queue m_asks;
+    
+    std::map<long, std::set<long>, std::greater<long>> m_bids;
+    std::map<long, std::set<long>> m_asks;
 
     void update_bid_ask_count(long price, long bid_diff, long ask_diff);
 
@@ -41,7 +39,6 @@ private:
 
     void update_accounts(const object_id& buyer_id, const object_id& seller_id, trade t);
 
-    bid_ask_pair get_next_bid_ask_pair();
     void execute_trades();
 public:
     market() = default;

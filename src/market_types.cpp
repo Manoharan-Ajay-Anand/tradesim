@@ -46,15 +46,12 @@ void tradesim::to_json(json& j, const position& pos) {
 }
 
 tradesim::trade tradesim::trade::match(const order& bid, const order& ask) {
-    if (bid.m_price < ask.m_price) {
-        return { false, 0, 0 };
-    }
     long quantity = std::min(bid.m_quantity, ask.m_quantity);
     long price = bid.m_price;
     if (ask.m_id < bid.m_id) {
         price = ask.m_price;
     }
-    return { true, price, quantity };
+    return { price, quantity };
 }
 
 void tradesim::to_json(json& j, const trade& t) {
