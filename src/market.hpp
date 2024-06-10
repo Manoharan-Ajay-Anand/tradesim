@@ -39,6 +39,8 @@ private:
 
     void update_accounts(const object_id& buyer_id, const object_id& seller_id, trade t);
 
+    void update_order(order& o, trade t, std::set<long>& order_set);
+
     void execute_trades();
 public:
     market() = default;

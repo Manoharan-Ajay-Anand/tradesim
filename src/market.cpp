@@ -52,6 +52,17 @@ void tradesim::market::update_accounts(const object_id& buyer_id, const object_i
     m_broadcast.send_msg(message { seller_id, ACCOUNT_MSG, seller });
 }
 
+void tradesim::market::update_order(order& o, trade t, std::set<long>& order_set) {
+    o.m_quantity -= t.m_quantity;
+    order_update ou = { o.m_id, o.m_type, t.m_price, t.m_quantity, o.m_quantity };
+    m_broadcast.send_msg(message { o.m_trader, ORDER_EXECUTED, ou });
+    if (o.m_quantity == 0) {
+        m_trader_orders[o.m_trader].erase(o.m_id);
+        order_set.erase(o.m_id);
+        m_orders.erase(o.m_id);
+    }
+}
+
 void tradesim::market::execute_trades() {
     auto bid_it = m_bids.begin();
     auto ask_it = m_asks.begin();
@@ -73,23 +84,8 @@ void tradesim::market::execute_trades() {
         update_bid_count(bid.m_price, quantity_diff);
         update_ask_count(ask.m_price, quantity_diff);
 
-        bid.m_quantity -= t.m_quantity;
-        order_update bid_ou = { bid.m_id, bid.m_type, t.m_price, t.m_quantity, bid.m_quantity };
-        m_broadcast.send_msg(message { bid.m_trader, ORDER_EXECUTED, bid_ou });
-        if (bid.m_quantity == 0) {
-            m_trader_orders[bid.m_trader].erase(bid.m_id);
-            bid_set.erase(bid.m_id);
-            m_orders.erase(bid.m_id);
-        }
-
-        ask.m_quantity -= t.m_quantity;
-        order_update ask_ou = { ask.m_id, ask.m_type, t.m_price, t.m_quantity, ask.m_quantity };
-        m_broadcast.send_msg(message { ask.m_trader, ORDER_EXECUTED, ask_ou });
-        if (ask.m_quantity == 0) {
-            m_trader_orders[ask.m_trader].erase(ask.m_id);
-            ask_set.erase(ask.m_id);
-            m_orders.erase(ask.m_id);
-        }
+        update_order(bid, t, bid_set);
+        update_order(ask, t, ask_set);
 
         if (bid_set.empty()) {
             bid_it = m_bids.erase(bid_it);
