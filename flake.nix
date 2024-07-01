@@ -16,7 +16,7 @@
         name = "tradesim-1.0";
         inherit system;
         nativeBuildInputs = [pkgs.cmake];
-        buildInputs = [pkgs.doctest pkgs.nlohmann_json pkgs.liburing];
+        buildInputs = [pkgs.doctest pkgs.nlohmann_json pkgs.liburing pkgs.openssl];
         cmakeFlags = [
           "-DCMAKE_INSTALL_SRVDIR=${placeholder "out"}/srv"
         ];
