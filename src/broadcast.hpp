@@ -14,24 +14,6 @@
 
 namespace tradesim {
 
-class broadcast;
-
-class subscription {
-private:
-    broadcast& m_broadcast;
-    object_id m_trader_id;
-
-public:
-    subscription(broadcast& b, const object_id& id);
-    ~subscription();
-
-    subscription(const subscription&) = delete;
-    subscription& operator=(const subscription&) = delete;
-
-    subscription(subscription&&) = delete;
-    subscription& operator=(subscription&&) = delete;
-};
-
 struct message {
     std::optional<object_id> m_recipient_opt;
     std::string_view m_type;
@@ -47,7 +29,7 @@ private:
     std::list<market_stream*> m_streams;
     std::unordered_map<object_id, std::list<market_stream*>::iterator> m_stream_map;
 public:
-    std::unique_ptr<subscription> subscribe(const object_id& id, market_stream* s_ptr);
+    bool subscribe(const object_id& id, market_stream* s_ptr);
     void unsubscribe(const object_id& id);
 
     void send_msg(const message& msg);

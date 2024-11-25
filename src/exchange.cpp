@@ -13,14 +13,21 @@ bool tradesim::exchange::join_market(const object_id& market_id, const object_id
     return true;
 }
 
-std::unique_ptr<tradesim::subscription> tradesim::exchange::subscribe(const object_id& market_id,
-                                                                      const object_id& trader_id,
-                                                                      market_stream* m_ptr) {
+bool tradesim::exchange::subscribe(const object_id& market_id,
+                                   const object_id& trader_id,
+                                   market_stream* m_ptr) {
     auto it = m_markets.find(market_id);
     if (it == m_markets.end()) {
-        return {};
+        return false;
     }
     return (it->second).subscribe(trader_id, m_ptr);
+}
+
+void tradesim::exchange::unsubscribe(const object_id& market_id, const object_id& trader_id) {
+    auto it = m_markets.find(market_id);
+    if (it != m_markets.end()) {
+        (it->second).unsubscribe(trader_id);
+    }
 }
 
 bool tradesim::exchange::place_order(const order_form& form) {

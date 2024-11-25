@@ -2,8 +2,8 @@
 
 #include <cppevent_base/event_loop.hpp>
 
-#include <cppevent_fcgi/fcgi_server.hpp>
-#include <cppevent_fcgi/router.hpp>
+#include <cppevent_http/http_server.hpp>
+#include <cppevent_http/http_router.hpp>
 
 #include "exchange.hpp"
 #include "welcome_endpoint.hpp"
@@ -25,15 +25,15 @@ int main() {
     tradesim::order_endpoint order { ex };
     tradesim::cancel_endpoint cancel { ex };
 
-    cppevent::router routes;
-    routes.get("/api/tradesim", welcome);
-    routes.post("/api/tradesim/create", create);
-    routes.post("/api/tradesim/join", join);
-    routes.get("/api/tradesim/stream/{marketId}/{traderId}", stream);
-    routes.post("/api/tradesim/order", order);
-    routes.post("/api/tradesim/cancel", cancel);
+    cppevent::http_router routes;
+    routes.get("/api/tradesim", &welcome);
+    routes.post("/api/tradesim/create", &create);
+    routes.post("/api/tradesim/join", &join);
+    routes.get("/api/tradesim/stream/{marketId}/{traderId}", &stream);
+    routes.post("/api/tradesim/order", &order);
+    routes.post("/api/tradesim/cancel", &cancel);
 
-    cppevent::fcgi_server tradesim_server("/tmp/tradesim.sock", loop, routes);
+    cppevent::http_server tradesim_server("localhost", "8080", routes, loop);
 
     loop.run();
     return 0;

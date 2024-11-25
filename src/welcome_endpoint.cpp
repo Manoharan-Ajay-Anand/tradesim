@@ -1,13 +1,17 @@
 #include "welcome_endpoint.hpp"
 
+#include <cppevent_http/http_output.hpp>
+
 #include <string_view>
 #include <format>
 
-constexpr std::string_view response = 
-        "content-length: 23\ncontent-type: text/plain\n\nWelcome to TradeSim API";
+constexpr std::string_view response = "Welcome to TradeSim API";
 
-cppevent::awaitable_task<void> tradesim::welcome_endpoint::process(const cppevent::context& cont,
-                                                                   cppevent::stream& s_stdin,
-                                                                   cppevent::output& o_stdout) {
-    co_await o_stdout.write(response);
+cppevent::task<void> tradesim::welcome_endpoint::serve(const cppevent::http_request& req,
+                                                       cppevent::http_body& body, 
+                                                       cppevent::http_output& res) {
+    co_await res.status(cppevent::HTTP_STATUS::OK)
+                .content_length(response.size())
+                .header("content-type", "text/plain")
+                .write(response);
 }

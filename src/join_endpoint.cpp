@@ -3,27 +3,29 @@
 #include "types.hpp"
 #include "exchange.hpp"
 
+#include <cppevent_http/http_output.hpp>
+#include <cppevent_http/http_body.hpp>
+#include <cppevent_http/http_request.hpp>
+
 #include <nlohmann/json.hpp>
 
 #include <string>
 #include <string_view>
 #include <format>
 
-constexpr std::string_view INVALID_INPUT_MESSAGE = 
-        "status: 400\ncontent-length: 13\ncontent-type: text/plain\n\nInvalid Input";
+constexpr std::string_view INVALID_INPUT_MESSAGE = "Invalid Input";
 
-constexpr std::string_view MARKET_ID_NOT_EXISTS_MESSAGE = 
-        "status: 400\ncontent-length: 24\ncontent-type: text/plain\n\nMarket ID does not exist";
+constexpr std::string_view MARKET_ID_NOT_EXISTS_MESSAGE = "Market ID does not exist";
 
 tradesim::join_endpoint::join_endpoint(exchange& e): m_exchange(e) {
 }
 
-cppevent::awaitable_task<void> tradesim::join_endpoint::process(const cppevent::context& cont,
-                                                                cppevent::stream& s_stdin,
-                                                                cppevent::output& o_stdout) {
-    long content_length = cont.get_content_len();
+cppevent::task<void> tradesim::join_endpoint::serve(const cppevent::http_request& req,
+                                                    cppevent::http_body& body, 
+                                                    cppevent::http_output& res) {
+    
     std::string input;
-    co_await s_stdin.read(input, content_length, true);
+    co_await body.read(input, LONG_MAX);
     
     object_id market_id;
     object_id trader_id;
@@ -36,18 +38,25 @@ cppevent::awaitable_task<void> tradesim::join_endpoint::process(const cppevent::
         invalid_input = true;
     }
     if (invalid_input) {
-        co_await o_stdout.write(INVALID_INPUT_MESSAGE);
+        co_await res.status(cppevent::HTTP_STATUS::BAD_REQUEST)
+                    .header("content-type", "text/plain")
+                    .content_length(INVALID_INPUT_MESSAGE.size())
+                    .write(INVALID_INPUT_MESSAGE);
         co_return;
     }
     
     if (!m_exchange.join_market(market_id, trader_id)) {
-        co_await o_stdout.write(MARKET_ID_NOT_EXISTS_MESSAGE);
+        co_await res.status(cppevent::HTTP_STATUS::BAD_REQUEST)
+                    .header("content-type", "text/plain")
+                    .content_length(MARKET_ID_NOT_EXISTS_MESSAGE.size())
+                    .write(MARKET_ID_NOT_EXISTS_MESSAGE);
         co_return;
     }
 
-    std::string response = std::format("content-length: {}\ncontent-type: text/plain\n\n{} {}",
-                                        market_id.size() + 1 + trader_id.size(), 
-                                        market_id.get_view(), trader_id.get_view());
-    co_await o_stdout.write(response);
+    std::string response = std::format("{} {}", market_id.get_view(), trader_id.get_view());
+    co_await res.status(cppevent::HTTP_STATUS::OK)
+                .header("content-type", "text/plain")
+                .content_length(response.size())
+                .write(response);
 }
 

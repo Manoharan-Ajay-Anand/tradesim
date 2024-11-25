@@ -42,7 +42,9 @@ void to_json(json& j, const object_id& o);
 
 void from_json(const json& j, object_id& o);
 
-using market_stream = cppevent::async_queue<std::string>; 
+using market_stream = cppevent::async_queue<std::string>;
+
+long to_long(std::string_view s);
 
 }
 

@@ -4,28 +4,17 @@
 
 #include <cppevent_base/status_awaiter.hpp>
 
-#include <cppevent_fcgi/output.hpp>
-
 #include <vector>
 #include <format>
 #include <iostream>
 
-tradesim::subscription::subscription(broadcast& b, const object_id& id): m_broadcast(b),
-                                                                         m_trader_id(id) {
-}
-
-tradesim::subscription::~subscription() {
-    m_broadcast.unsubscribe(m_trader_id);
-}
-
-std::unique_ptr<tradesim::subscription> tradesim::broadcast::subscribe(const object_id& id,
-                                                                       market_stream* s_ptr) {
+bool tradesim::broadcast::subscribe(const object_id& id, market_stream* s_ptr) {
     auto it = m_stream_map.find(id);
     if (it != m_stream_map.end()) {
-        return {};
+        return false;
     }
     m_stream_map[id] = m_streams.insert(m_streams.end(), s_ptr);
-    return std::make_unique<subscription>(*this, id);
+    return true;
 }
 
 void tradesim::broadcast::unsubscribe(const object_id& id) {

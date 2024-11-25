@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cstring>
 #include <stdexcept>
+#include <charconv>
 
 const tradesim::object_id& tradesim::object_id::operator=(std::string_view s) {
     m_size = s.size();
@@ -46,4 +47,13 @@ void tradesim::from_json(const json& j, object_id& o) {
         throw std::runtime_error("ID > 30 characters");
     }
     o = std::string_view { s };
+}
+
+long tradesim::to_long(std::string_view s) {
+    long l;
+    auto result = std::from_chars(s.begin(), s.end(), l);
+    if (result.ec != std::errc {}) {
+        throw std::runtime_error("tradesim to_long: conversion failed");
+    }
+    return l;
 }

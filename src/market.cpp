@@ -100,13 +100,13 @@ void tradesim::market::register_account(const object_id& trader_id) {
     m_accounts.try_emplace(trader_id);
 }
 
-std::unique_ptr<tradesim::subscription> tradesim::market::subscribe(const object_id& trader_id,
+bool tradesim::market::subscribe(const object_id& trader_id,
                                                                     market_stream* m_ptr) {
     if (m_accounts.find(trader_id) == m_accounts.end()) {
-        return {};
+        return false;
     }
-    std::unique_ptr<subscription> sub_ptr = m_broadcast.subscribe(trader_id, m_ptr);
-    if (sub_ptr) {
+    bool subbed = m_broadcast.subscribe(trader_id, m_ptr);
+    if (subbed) {
         m_broadcast.send_msg(message { trader_id, TRADE_MSG, m_last_trade });
 
         auto& account = m_accounts.at(trader_id);
@@ -122,7 +122,7 @@ std::unique_ptr<tradesim::subscription> tradesim::market::subscribe(const object
             m_broadcast.send_msg(message { trader_id, ORDER_SUBMITTED, ou });
         }
     }
-    return sub_ptr;
+    return subbed;
 }
 
 void tradesim::market::unsubscribe(const object_id& trader_id) {
