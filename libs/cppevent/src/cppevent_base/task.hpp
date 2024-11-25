@@ -1,56 +1,44 @@
 #ifndef CPPEVENT_BASE_TASK_HPP
 #define CPPEVENT_BASE_TASK_HPP
 
-#include <coroutine>
 #include <optional>
+#include <coroutine>
 #include <exception>
 
 namespace cppevent {
 
-struct task {
-    struct promise_type {
-        task get_return_object() { return {}; }
-
-        std::suspend_never initial_suspend() { return {}; }
-        std::suspend_never final_suspend() noexcept { return {}; }
-        
-        void unhandled_exception() {
-            throw;
-        }
-        
-        void return_void() {}
-    };
-};
-
-template <typename T>
 struct final_awaiter {
-    bool await_ready() noexcept { return false; }
+    bool m_linked;
+    std::coroutine_handle<> m_outer;
 
-    std::coroutine_handle<> await_suspend(std::coroutine_handle<T> handle) noexcept {
-        auto& waiting = handle.promise().m_waiting;
-        if (waiting) {
-            return waiting;
-        }
-        return std::noop_coroutine();
+    bool await_ready() noexcept {
+        return !m_linked;
+    }
+
+    std::coroutine_handle<> await_suspend(std::coroutine_handle<> handle) noexcept {
+        return m_outer;
     }
 
     void await_resume() noexcept {}
 };
 
-template <typename T>
-struct awaitable_task {
+template <typename T = void>
+struct task {
     struct promise_type {
-
         std::optional<T> m_val_opt;
-        std::coroutine_handle<> m_waiting;
         std::exception_ptr m_exception;
 
-        awaitable_task<T> get_return_object() {
+        std::coroutine_handle<> m_outer = std::noop_coroutine();
+        
+        task<T> get_return_object() {
             return { std::coroutine_handle<promise_type>::from_promise(*this) };
         }
 
         std::suspend_never initial_suspend() { return {}; }
-        final_awaiter<promise_type> final_suspend() noexcept { return {}; }
+        
+        final_awaiter final_suspend() noexcept { 
+            return { true, m_outer };
+        }
         
         void unhandled_exception() {
             m_exception = std::current_exception();
@@ -66,24 +54,24 @@ private:
     std::coroutine_handle<promise_type> m_handle;
 
 public:
-    awaitable_task(std::coroutine_handle<promise_type> handle): m_handle(handle) {}
+    task(std::coroutine_handle<promise_type> handle): m_handle(handle) {}
 
-    ~awaitable_task() {
+    ~task() {
         m_handle.destroy();
     }
 
-    awaitable_task(const awaitable_task&) = delete;
-    awaitable_task& operator=(const awaitable_task&) = delete;
+    task(const task&) = delete;
+    task& operator=(const task&) = delete;
 
-    awaitable_task(awaitable_task&&) = delete;
-    awaitable_task& operator=(awaitable_task&&) = delete;
+    task(task&&) = delete;
+    task& operator=(task&&) = delete;
 
     bool await_ready() noexcept {
         return m_handle.done();
     }
     
     void await_suspend(std::coroutine_handle<> handle) {
-        m_handle.promise().m_waiting = handle;
+        m_handle.promise().m_outer = handle;
     }
     
     T&& await_resume() {
@@ -96,18 +84,22 @@ public:
 };
 
 template<>
-struct awaitable_task<void> {
+struct task<> {
     struct promise_type {
-
-        std::coroutine_handle<> m_waiting;
         std::exception_ptr m_exception;
 
-        awaitable_task<void> get_return_object() {
+        bool m_linked = true;
+        std::coroutine_handle<> m_outer = std::noop_coroutine();
+        
+        task<> get_return_object() {
             return { std::coroutine_handle<promise_type>::from_promise(*this) };
         }
 
         std::suspend_never initial_suspend() { return {}; }
-        final_awaiter<promise_type> final_suspend() noexcept { return {}; }
+        
+        final_awaiter final_suspend() noexcept { 
+            return { m_linked, m_outer };
+        }
         
         void unhandled_exception() {
             m_exception = std::current_exception();
@@ -115,28 +107,32 @@ struct awaitable_task<void> {
         
         void return_void() {}
     };
+
 private:
     std::coroutine_handle<promise_type> m_handle;
+    bool m_linked = true;
 
 public:
-    awaitable_task(std::coroutine_handle<promise_type> handle): m_handle(handle) {}
+    task(std::coroutine_handle<promise_type> handle): m_handle(handle) {}
 
-    ~awaitable_task() {
-        m_handle.destroy();
+    ~task() {
+        if (m_linked) {
+            m_handle.destroy();
+        }
     }
 
-    awaitable_task(const awaitable_task&) = delete;
-    awaitable_task& operator=(const awaitable_task&) = delete;
+    task(const task&) = delete;
+    task& operator=(const task&) = delete;
 
-    awaitable_task(awaitable_task&&) = delete;
-    awaitable_task& operator=(awaitable_task&&) = delete;
+    task(task&&) = delete;
+    task& operator=(task&&) = delete;
 
     bool await_ready() noexcept {
         return m_handle.done();
     }
     
     void await_suspend(std::coroutine_handle<> handle) {
-        m_handle.promise().m_waiting = handle;
+        m_handle.promise().m_outer = handle;
     }
     
     void await_resume() {
@@ -144,6 +140,11 @@ public:
         if (promise.m_exception) {
             std::rethrow_exception(promise.m_exception);
         }
+    }
+
+    void unlink() {
+        m_handle.promise().m_linked = false;
+        m_linked = false;
     }
 };
 

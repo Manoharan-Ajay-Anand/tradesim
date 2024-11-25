@@ -6,7 +6,8 @@ add_library(cppevent_base OBJECT
   io_listener.cpp
   io_service.cpp
   status_awaiter.cpp
-  suspended_coro.cpp
+  status_store.cpp
   timer.cpp
+  types.cpp
   util.cpp
 )

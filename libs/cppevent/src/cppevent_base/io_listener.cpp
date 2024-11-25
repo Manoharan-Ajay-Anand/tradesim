@@ -1,19 +1,20 @@
 #include "io_listener.hpp"
 
+#include "event_bus.hpp"
 #include "event_callback.hpp"
 
 #include <liburing.h>
 
 cppevent::io_listener::io_listener(event_bus& bus,
                                    io_uring* ring,
-                                   int fd): m_callback(bus),
+                                   int fd): m_callback(bus.get_event_callback()),
                                             m_ring(ring),
                                             m_fd(fd) {
 }
 
 io_uring_sqe* cppevent::io_listener::get_sqe() {
     io_uring_sqe* sqe = io_uring_get_sqe(m_ring);
-    io_uring_sqe_set_data64(sqe, m_callback.get_id());
+    io_uring_sqe_set_data64(sqe, static_cast<uint64_t>(m_callback.get_id()));
     return sqe;
 }
 
