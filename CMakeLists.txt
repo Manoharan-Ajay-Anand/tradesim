@@ -9,7 +9,7 @@ if(PROJECT_IS_TOP_LEVEL)
   include(CTest)
   set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_CXX_EXTENSIONS OFF)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines -Wreorder")
 endif()
 
 add_subdirectory(src)
@@ -17,8 +17,8 @@ add_subdirectory(src)
 add_library(cppevent
   $<TARGET_OBJECTS:cppevent_base>
   $<TARGET_OBJECTS:cppevent_net>
-  $<TARGET_OBJECTS:cppevent_fcgi>
   $<TARGET_OBJECTS:cppevent_crypto>
+  $<TARGET_OBJECTS:cppevent_http>
   $<TARGET_OBJECTS:cppevent_postgres>
 )
 

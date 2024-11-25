@@ -1,22 +1,27 @@
 #include "event_bus.hpp"
 
-#include "event_callback.hpp"
+#include "status_store.hpp"
 
 #include <utility>
 
-cppevent::e_id cppevent::event_bus::register_event_callback(event_callback* callback) {
-    e_id id = ++m_id_counter;
-    m_callbacks[id] = callback;
-    return id;
-}
-
-void cppevent::event_bus::deregister_event_callback(e_id id) {
-    m_callbacks.erase(id);
+cppevent::event_callback cppevent::event_bus::get_event_callback() {
+    status_store* store =  nullptr;
+    if (m_released.empty()) {
+        e_id id { static_cast<uint32_t>(m_stores.size()), 0 };
+        auto ptr = std::make_unique<status_store>(id, m_released);
+        store = ptr.get();
+        m_stores.push_back(std::move(ptr));    
+    } else {
+        store = m_released.front();
+        m_released.pop();
+    }
+    store->reset();
+    return event_callback { store };
 }
 
 void cppevent::event_bus::notify(e_id id, e_status status) {
-    auto it = m_callbacks.find(id);
-    if (it != m_callbacks.end()) {
-        (it->second)->notify(status);
+    auto& store = m_stores[id.m_index];
+    if (store->get_id() == id) {
+        store->notify(status);
     }
 }
