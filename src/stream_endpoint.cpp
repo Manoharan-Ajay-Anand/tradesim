@@ -7,8 +7,6 @@
 #include <cppevent_http/http_body.hpp>
 #include <cppevent_http/http_request.hpp>
 
-#include <iostream>
-
 constexpr std::string_view INVALID_MARKET_ID = "Invalid Market ID";
 
 constexpr std::string_view INVALID_TRADER_ID = "Invalid Trader ID";
@@ -56,10 +54,9 @@ cppevent::task<void> tradesim::stream_endpoint::serve(const cppevent::http_reque
     market_id = market_id_str;
     trader_id = trader_id_str;
 
-    co_await res.status(cppevent::HTTP_STATUS::OK)
-                .header("content-type", "text/event-stream")
-                .header("nx-accel-buffering","no")
-                .write("event: ping\ndata: {}\n\n");
+    res.status(cppevent::HTTP_STATUS::OK)
+       .header("content-type", "text/event-stream")
+       .header("x-accel-buffering","no");
 
     market_stream stream { m_loop };
 

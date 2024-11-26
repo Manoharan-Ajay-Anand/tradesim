@@ -21,7 +21,7 @@ cppevent::task<void> tradesim::create_endpoint::serve(const cppevent::http_reque
                                                       cppevent::http_body& body, 
                                                       cppevent::http_output& res) {
 
-    long content_length = to_long(req.get_header("content_length").value_or("0"));
+    long content_length = to_long(req.get_header("content-length").value_or("0"));
     if (content_length > MAX_ID_SIZE) {
         co_await res.status(cppevent::HTTP_STATUS::BAD_REQUEST)
                     .header("content-type", "text/plain")

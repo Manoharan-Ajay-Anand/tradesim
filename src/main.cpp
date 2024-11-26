@@ -29,11 +29,11 @@ int main() {
     routes.get("/api/tradesim", &welcome);
     routes.post("/api/tradesim/create", &create);
     routes.post("/api/tradesim/join", &join);
-    routes.get("/api/tradesim/stream/{marketId}/{traderId}", &stream);
+    routes.get("/api/tradesim/stream/:marketId/:traderId", &stream);
     routes.post("/api/tradesim/order", &order);
     routes.post("/api/tradesim/cancel", &cancel);
 
-    cppevent::http_server tradesim_server("localhost", "8080", routes, loop);
+    cppevent::http_server tradesim_server("/tmp/tradesim.sock", routes, loop);
 
     loop.run();
     return 0;

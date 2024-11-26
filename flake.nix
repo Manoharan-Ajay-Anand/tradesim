@@ -13,7 +13,7 @@
         src = builtins.path {
           path = ./.;
         };
-        name = "tradesim-1.0";
+        name = "tradesim-2.0";
         inherit system;
         nativeBuildInputs = [pkgs.cmake];
         buildInputs = [pkgs.doctest pkgs.nlohmann_json pkgs.liburing pkgs.openssl];
